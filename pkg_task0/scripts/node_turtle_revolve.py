@@ -1,5 +1,11 @@
 #!/usr/bin/env python
 
+"""
+This module makes the turtle 
+revolve in the turtlesim window.
+"""
+
+
 # Python libraries
 import math
 import sys
@@ -13,7 +19,30 @@ from turtlesim.msg import Pose
 
 
 class NodeTurtleRevolve:
+    """
+    Class to make the turtle revolve one complete circle
+    and then stop it.
+
+    Attributes:
+        velocity_publisher: Publisher of turtle1/cmd_vel. 
+        velocity_msg: Message variable which is published
+                      in the topic turtle1/cmd.
+        rate: Used to iterate in loop at the specified
+              frequency.
+        shift: The shift in theta to convert it into
+               0 to inf form.
+        theta: Current value of theta.
+        radius: Radius of the turtle's path.
+        total_distance: Circumference of the circle.
+    """
     def __init__(self, vx, wz):
+        """
+        The constructor for NodeTurtleRevolve class.
+
+        Parameters:
+            vx: Linear velocity along x-axis.
+            wz: Angular velocity along z-axis.
+        """
         # turtle1/cmd_vel publisher
         self.velocity_publisher = rospy.Publisher(
             'turtle1/cmd_vel',
@@ -52,6 +81,13 @@ class NodeTurtleRevolve:
 
 
     def pose_callback(self, position):
+        """
+        Callback function for turtle1/pose topic.
+        It updates the theta variable.
+
+        Parameter:
+            position: Message from the turtle1/pose. 
+        """
         # Convert theta into 0 to infinity format 
         dtheta = position.theta + self.shift - self.theta
         self.shift += (dtheta < -math.pi) * 2*math.pi
@@ -59,9 +95,10 @@ class NodeTurtleRevolve:
 
 
     def revolve(self):
-
-        # Revolve till total distance is covered or 
-        # Ctrl+C is pressed.
+        """
+        Make the turtle revolve untill it reaches
+        its intial position or Ctrl+C is pressed.
+        """
         while ((self.theta*self.radius < self.total_distance) 
                 and not rospy.is_shutdown()):
             self.velocity_publisher.publish(self.velocity_msg)
