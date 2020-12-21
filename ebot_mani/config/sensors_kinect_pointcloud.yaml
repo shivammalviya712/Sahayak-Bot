@@ -1,0 +1,9 @@
+sensors:
+  - sensor_plugin: occupancy_map_monitor/PointCloudOctomapUpdater
+    point_cloud_topic: camera2/depth/points2
+    max_range: 1.0        # Max can be 20 
+    point_subsample: 1    #Choose one of every point_subsample points.
+    padding_offset: 0.1   # https://github.com/ros-planning/moveit_ros/issues/342
+    padding_scale: 1.0
+    max_update_rate: 1.0  # Max can be 10
+    filtered_cloud_topic: filtered_cloud  #/move_group/filtered_cloud
