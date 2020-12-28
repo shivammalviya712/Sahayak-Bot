@@ -1,10 +1,12 @@
 <launch>
 
 <arg name="joint_state_pubs_gui" default="false"/>
+<arg name="joint_state_pubs_rate" default="10"/>
 
 <!-- Joint state publisher -->
 <node name="joint_state_publisher" pkg="joint_state_publisher" type="joint_state_publisher">
     <param name="/use_gui" value="$(arg joint_state_pubs_gui)"/>
+    <param name="/rate" value="$(arg joint_state_pubs_rate)"/>
     <rosparam param="/source_list">[/joint_states]</rosparam>
 </node>
 
@@ -54,6 +56,10 @@ args="spawn joint_state_controller" respawn="false" output="screen"/>
   <arg name="rviz_config" value="$(find ebot_mani)/launch/moveit.rviz"/>
   <arg name="debug" value="false"/>
 </include> 
+
+
+<!-- Node to controller manipulator -->
+<!-- <node name="sara" pkg="ebot_mani" type="explore_pointcloud2.py" output="screen"/> -->
 
 
 </launch>

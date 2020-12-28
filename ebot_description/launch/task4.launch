@@ -2,6 +2,7 @@
 
 <!-- Arguments -->
 <arg name="joint_state_pubs_gui" default="false"/>
+<arg name="joint_state_pubs_rate" default="20"/>
 <arg name="rec_name" default="task4.bag"/>
 <arg name="record" default="false"/>
 <arg name="gazebo_gui" default="false"/>
@@ -36,6 +37,7 @@
 <!-- My launch file -->
 <include file="$(find ebot_mani)/launch/my_launch.launch">
   <arg name="joint_state_pubs_gui" value="$(arg joint_state_pubs_gui)"/>
+  <arg name="joint_state_pubs_rate" value="$(arg joint_state_pubs_rate)"/>
 </include>
 
 

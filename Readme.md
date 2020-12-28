@@ -1,4 +1,3 @@
-
 ## Setup
 
 > ```ImportError: No module named gazebo_ros_link_attacher.srv```
@@ -50,7 +49,7 @@ For frame [camera_depth_frame]: Frame [camera_depth_frame] does not exist
 >       - Make new package using moveit setup assistant
 ---
 
-## Make octomap
+## Generate octomap
 > - Start move_group node
 >   - ros_controller.yaml
 >   - trajectory_controller.yaml
@@ -83,10 +82,107 @@ For frame [camera_depth_frame]: Frame [camera_depth_frame] does not exist
 [ERROR] [1608527089.121428651, 4.343000000]: Transform cache was not updated. Self-filtering may fail.
 ```
 > - [tf/Tutorials/tf and Time (Python)](http://library.isr.ist.utl.pt/docs/roswiki/tf(2f)Tutorials(2f)tf(20)and(20)Time(2028)Python(29).html)
+> - tf_monitor
+> - rqt_tf_tree
+> - Why robot_state_publisher publishes at different frequency?
+> - Why some publisher have 10000 publish rate?
+> - Increase joint_state_publisher rate
+>   - 20 works fine
 
-> - Reduce the octomap range (Instructor)
->   - Doesm't help
 > - Consuming too much resources (cpu)
+>   - Reduce the octomap range (Instructor) -> Doesm't help
 >   - Even turning off gazebo's gui doesn't help 
+---
 
-> - Save octomap
+## Save octomap
+> - [Saving tutorial](https://www.youtube.com/watch?v=Ib1ISnLlD38)
+> - Explore octomap_server
+>   - octomap_server loads a 3D map (as Octree-based OctoMap) and distributes it to other nodes in a compact binary format. See octomap_saver on how to request or save a map file.
+> - Explore octomap_mapping
+---
+
+## PCL python interface
+> - [python-pcl dependency error](https://github.com/strawlab/python-pcl/issues/317)
+> - PCL installed but at what cost (whole ros got deleted (-_-))
+> - Install ros
+> - PCL and ros melodic can't be together
+> - Here comes conda, create new env and change the interpreter path in the script
+> - [Of course!! Some errors](https://github.com/strawlab/python-pcl/issues/285)
+> - [About methods of PCL classes](https://nlesc.github.io/python-pcl/)
+> - [Ros to pcl message conversion](https://www.programcreek.com/python/example/99841/sensor_msgs.msg.PointCloud2)
+> - [Filter codes](https://github.com/mithi/point-cloud-filter)
+
+> - _**Dependency error**_
+>   - Create softlinks(trial1)
+        
+        ```
+        conda create -n trial1 python=2.7.17
+        conda install -c sirokujira pcl --channel conda-forge
+        conda install -c sirokujira python-pcl --channel conda-forge
+        ln -s libboost_system.so.1.72.0 libboost_system.so.1.66.0
+        ln -s libboost_filesystem.so.1.72.0 libboost_filesystem.so.1.66.0
+        ln -s libboost_thread.so.1.72.0 libboost_thread.so.1.66.0
+        ln -s libboost_date_time.so.1.72.0 libboost_date_time.so.1.66.0
+        ln -s libboost_iostreams.so.1.72.0 libboost_iostreams.so.1.66.0
+        ln -s libboost_chrono.so.1.72.0 libboost_chrono.so.1.66.0
+        ln -s libboost_atomic.so.1.72.0 libboost_atomic.so.1.66.0
+        ln -s libboost_regex.so.1.72.0 libboost_regex.so.1.66.0
+        ```
+
+        ```
+        ImportError: /usr/lib/x86_64-linux-gnu/libpcl_visualization.so.1.8: undefined symbol: _ZN3pcl9PCDWriter10writeASCIIERKNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEERKNS_14PCLPointCloud2ERKN5Eigen6MatrixIfLi4ELi1ELi0ELi4ELi1EEERKNSC_10QuaternionIfLi0EEEi
+
+        ```
+>       - Couldn't solve this
+
+>   - [Build from source](https://github.com/strawlab/python-pcl/issues/158)
+>   - [udacity/RoboND-Perception-Exercises](https://github.com/udacity/RoboND-Perception-Exercises)
+    ```
+    cl/_pcl_180.cpp:1:2: error: #error Do not use this file, it is the result of a failed Cython compilation.
+    #error Do not use this file, it is the result of a failed Cython compilation.
+    ^~~~~
+    error: command 'x86_64-linux-gnu-gcc' failed with exit status 1
+    ```
+>       - Some issue with cython version
+>           - Cython version
+        
+        ```
+        pcl/pxi/PointCloud_PointXYZRGB_180.pxi:104:29: Cannot take address of Python variable
+        ```
+
+>           - Works with Cython=0.25.2 
+>   - [link](https://github.com/strawlab/python-pcl/issues/278)
+
+> - Explore sensor_msgs/PointCloud2
+> - Convert ROS pc to PCL pc
+
+### Voxel Grid filter 
+> - Downsampling using the Voxel Grid Filter
+> - The idea behind data downsampling is just to speed things up 
+>  less points means less time needed to spend within the segmentation loop.
+
+### Passthrough filter
+> - Filter out points which are outside a specific range of a specific axis
+
+### Ransac Plane fitting
+> - [Youtube](https://www.youtube.com/watch?v=9D5rrtCC_E0)
+> - Seperate outliers and inliers
+
+
+### Statistically outlier filter
+> - This filters out the statistical noise of the scene
+> - Uses point neighborhood statistics to filter outlier data
+
+
+> - Visualise *.pcd file
+
+```
+pcl_viewer -multiview 1 <pcd_filepath>
+```
+---
+## Detection and localisation 
+
+
+
+---
+> **_Thank me later you noob coders_**
