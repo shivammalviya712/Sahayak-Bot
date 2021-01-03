@@ -99,6 +99,8 @@ For frame [camera_depth_frame]: Frame [camera_depth_frame] does not exist
 > - Explore octomap_server
 >   - octomap_server loads a 3D map (as Octree-based OctoMap) and distributes it to other nodes in a compact binary format. See octomap_saver on how to request or save a map file.
 > - Explore octomap_mapping
+> - TODO: Check later if required
+
 ---
 
 ## PCL python interface
@@ -166,23 +168,60 @@ For frame [camera_depth_frame]: Frame [camera_depth_frame] does not exist
 
 ### Ransac Plane fitting
 > - [Youtube](https://www.youtube.com/watch?v=9D5rrtCC_E0)
+> - [Medium](https://medium.com/@ajithraj_gangadharan/3d-ransac-algorithm-for-lidar-pcd-segmentation-315d2a51351)
 > - Seperate outliers and inliers
 
 
 ### Statistically outlier filter
 > - This filters out the statistical noise of the scene
 > - Uses point neighborhood statistics to filter outlier data
-
+> - TODO: [Issue when you use for PointCloud_PointXYZRGB](https://github.com/udacity/RoboND-Perception-Exercises/issues/18)
 
 > - Visualise *.pcd file
 
 ```
 pcl_viewer -multiview 1 <pcd_filepath>
 ```
+
+### Cropbox Filter
+> - Available in PointCloud, not in PointCloud_PointXYZRGB()
+> - I implemented it using 3 passthrough filters in series, for PointCloud_PointXYZRGB()
+> - Available in PointCloud
+
+### Euclidean cluster extraction
+> - [KDtree](https://youtu.be/ivdmGcZo6U8)
+> - In nutshell we create clusters of points, and thus separate objects
+> - Available in PointCloud, not in PointCloud_PointXYZRGB()
+
+> - TODO: Order of filter can be optimised later if required, by checking the time taken
+
 ---
-## Detection and localisation 
+## Recognition and localisation 
+> -  Explore all the algorithms
+>       - [Pointnet](https://arxiv.org/pdf/1612.00593.pdf)
+>       - [Attentional PointNet](https://hal.inria.fr/hal-02156555/document)
 
 
+> - Pointcloud map
+>      - [Map_merge_3d](http://wiki.ros.org/map_merge_3d)
+>      - [Laser_assembler](http://wiki.ros.org/laser_assembler)
+>      - [Octomap](https://github.com/OctoMap/octomap_ros/blob/melodic-devel/include/octomap_ros/conversions.h)
+
+> - PCD model of objects
+>      - [Help](https://products.aspose.app/3d/conversion/dae-to-pdf)
+>      - [Help](https://github.com/PaulBernier/obj2pcd)
+
+> - Train Pointnet
+>      - [Architecture and Implementation](https://medium.com/@luis_gonzales/an-in-depth-look-at-pointnet-111d7efdaa1a)
+>      - [Tutorial](https://towardsdatascience.com/deep-learning-on-point-clouds-implementing-pointnet-in-google-colab-1fd65cd3a263)
+>      - Implement your own motherfucking pointnet
+>      - [Pre-trained model in pytorch](https://github.com/meder411/PointNet-PyTorch?files=1)
+>      - [Pre-trained model in tensorflow](https://github.com/TianzhongSong/PointNet-Keras)
+>      - [Point Cloud Deep Learning Extension Library for PyTorch](https://pypi.org/project/torch-points3d/)
+
+> - I could load Pointnet model on using pytorch
+>      - [Pre-trained model in pytorch](https://github.com/meder411/PointNet-PyTorch?files=1)
+>      - Change some part of the codes so that it can work on your cpu
 
 ---
 > **_Thank me later you noob coders_**
