@@ -24,8 +24,9 @@ def main():
         time = rospy.Time.now()
         flags.update()
         camera.pc.preprocess()
+        camera.pc.localize_clusters()
         rospy.loginfo('Time taken: ' + str((rospy.Time.now() - time)/1e6))
-        rate.sleep()
+        rate.sleep()    
 
 
 if __name__=='__main__':
