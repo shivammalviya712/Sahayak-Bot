@@ -48,7 +48,7 @@ class Settings(object):
         euclidean_cluster_filter = Config(
             cluster_tolerance=0.02,
             max_cluster_size=25000,
-            min_cluster_size=100
+            min_cluster_size=800
         )
         
         return Config(
