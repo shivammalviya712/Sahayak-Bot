@@ -1,0 +1,40 @@
+{
+    "configurations": [
+        {
+            "browse": {
+                "databaseFilename": "",
+                "limitSymbolsToIncludedHeaders": true
+            },
+            "includePath": [
+                "/home/shivam/Projects/eYRC/catkin_ws/devel/include/**",
+                "/opt/ros/melodic/include/**",
+                "/home/shivam/Projects/eYRC/catkin_ws/src/moveit/moveit_planners/chomp/chomp_motion_planner/include/**",
+                "/home/shivam/Projects/eYRC/catkin_ws/src/object_recognition/include/**",
+                "/home/shivam/Projects/eYRC/catkin_ws/src/sahayak_bot/gazebo-pkgs/gazebo_grasp_plugin/include/**",
+                "/home/shivam/Projects/eYRC/catkin_ws/src/sahayak_bot/gazebo_ros_link_attacher/include/**",
+                "/home/shivam/Projects/eYRC/catkin_ws/src/sahayak_bot/gazebo-pkgs/gazebo_state_plugins/include/**",
+                "/home/shivam/Projects/eYRC/catkin_ws/src/sahayak_bot/gazebo-pkgs/gazebo_test_tools/include/**",
+                "/home/shivam/Projects/eYRC/catkin_ws/src/sahayak_bot/gazebo-pkgs/gazebo_version_helpers/include/**",
+                "/home/shivam/Projects/eYRC/catkin_ws/src/sahayak_bot/gazebo-pkgs/gazebo_world_plugin_loader/include/**",
+                "/home/shivam/Projects/eYRC/catkin_ws/src/moveit/moveit_planners/chomp/chomp_interface/include/**",
+                "/home/shivam/Projects/eYRC/catkin_ws/src/moveit/moveit_ros/benchmarks/include/**",
+                "/home/shivam/Projects/eYRC/catkin_ws/src/moveit/moveit_plugins/moveit_ros_control_interface/include/**",
+                "/home/shivam/Projects/eYRC/catkin_ws/src/moveit/moveit_ros/move_group/include/**",
+                "/home/shivam/Projects/eYRC/catkin_ws/src/moveit/moveit_ros/occupancy_map_monitor/include/**",
+                "/home/shivam/Projects/eYRC/catkin_ws/src/moveit/moveit_ros/robot_interaction/include/**",
+                "/home/shivam/Projects/eYRC/catkin_ws/src/moveit/moveit_ros/moveit_servo/include/**",
+                "/home/shivam/Projects/eYRC/catkin_ws/src/moveit/moveit_setup_assistant/include/**",
+                "/home/shivam/Projects/eYRC/catkin_ws/src/moveit/moveit_plugins/moveit_simple_controller_manager/include/**",
+                "/home/shivam/Projects/eYRC/catkin_ws/src/sahayak_bot/general-message-pkgs/object_msgs_tools/include/**",
+                "/home/shivam/Projects/eYRC/catkin_ws/src/sahayak_bot/robotiq_85_gripper-master/robotiq_85_simulation/roboticsgroup_gazebo_plugins/include/**",
+                "/usr/include/**"
+            ],
+            "name": "ROS",
+            "intelliSenseMode": "gcc-x64",
+            "compilerPath": "/usr/bin/gcc",
+            "cStandard": "gnu11",
+            "cppStandard": "gnu++14"
+        }
+    ],
+    "version": 4
+}

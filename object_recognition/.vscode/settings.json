@@ -1,0 +1,17 @@
+{
+    "files.associations": {
+        "string": "cpp",
+        "core": "cpp",
+        "numericaldiff": "cpp",
+        "ostream": "cpp"
+    },
+    "python.autoComplete.extraPaths": [
+        "/home/shivam/Projects/eYRC/catkin_ws/devel/lib/python2.7/dist-packages",
+        "/opt/ros/melodic/lib/python2.7/dist-packages"
+    ],
+    "python.analysis.extraPaths": [
+        "/home/shivam/Projects/eYRC/catkin_ws/devel/lib/python2.7/dist-packages",
+        "/opt/ros/melodic/lib/python2.7/dist-packages"
+    ],
+    "cmake.configureOnOpen": false
+}
