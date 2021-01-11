@@ -22,30 +22,18 @@ void Camera::pc_callback(const sensor_msgs::PointCloud2ConstPtr &msg_ptr)
     pcl::fromPCLPointCloud2(pcl_pc2, *_pcl_pc_ptr);
 }
 
-void Camera::analysis()
-{
-    if (_pcl_pc_ptr->size()>0)
-    {
-        std::cout << "Analysis of Pointcloud\n  "
-            << "Width: " << _pcl_pc_ptr->width << "\n"
-            << "Height: " << _pcl_pc_ptr->height << "\n"
-            << std::endl;
-    }
-}
-
 void Camera::preprocess()
 {
     // Save
-    save_pc(_pcl_pc_ptr, "raw.pcd");
+    save_pc(_pcl_pc_ptr, "raw");
     
     // Voxel Filter
     _pcl_pc_ptr = _filters.voxel_filter(
         _pcl_pc_ptr,
         CameraSettings::Filters::VoxelFilter::leaf_size
     );
-
     // Save
-    save_pc(_pcl_pc_ptr, "after_voxel.pcd");
+    save_pc(_pcl_pc_ptr, "after_voxel");
 
     // Cropbox Filter
     _pcl_pc_ptr = _filters.cropbox_filter(
@@ -55,25 +43,76 @@ void Camera::preprocess()
         CameraSettings::Filters::CropboxFilter::translation,
         CameraSettings::Filters::CropboxFilter::rotation
     );
-    
     // Save
-    save_pc(_pcl_pc_ptr, "after_cropbox.pcd");
+    save_pc(_pcl_pc_ptr, "after_cropbox");
+
+    // Ransac filter
+    _pcl_pc_ptr = _filters.ransac_filter(
+        _pcl_pc_ptr,
+        CameraSettings::Filters::RansacFilter::threshold
+    );
+    // Save
+    save_pc(_pcl_pc_ptr, "after_ransac");
+
+    // Clustering
+    _ptrs_cluster = _filters.cluster_filter(
+        _pcl_pc_ptr,
+        CameraSettings::Filters::ClusterFilter::tolerance,
+        CameraSettings::Filters::ClusterFilter::min_cluster_size,
+        CameraSettings::Filters::ClusterFilter::max_cluster_size
+    );
+    // Save
+    save_pc(_ptrs_cluster, "after_cluster");
+
+}
+
+void Camera::analysis()
+{    
+    std::cout << "Analysis of Pointcloud\n  "
+        << "Width: " << _pcl_pc_ptr->width << "\n"
+        << "Height: " << _pcl_pc_ptr->height << "\n"
+        << std::endl;
 }
 
 void Camera::save_pc(pcl::PointCloud<PointType>::Ptr &pointcloud_ptr, std::string filename)
 {
+    filename = filename + ".pcd";
     if(
         pcl::io::savePCDFileASCII (
-            "/home/raj/catkin_ws/src/SBRepo/object_recognition/point_cloud/" + filename,
+            "/home/shivam/Projects/eYRC/catkin_ws/src/object_recognition/point_cloud/" + filename,
             *_pcl_pc_ptr
         )>=0
     )
     {
-        std::cout << "Saved " << filename << std::endl;
+        std::cout << "Saved " << filename << "\n" << std::endl;
     }
     else
     {
-        std::cout << "Not saved " << filename << std::endl;
+        std::cout << "Not saved " << filename << "\n" << std::endl;
     }
     
+}
+
+void Camera::save_pc(std::vector<pcl::PointCloud<PointType>::Ptr> &ptrs_cluster, std::string filename)
+{
+    pcl::PointCloud<PointType>::Ptr cloud_cluster_ptr;
+    for (int j=0; j<ptrs_cluster.size(); j++)
+    {
+        cloud_cluster_ptr = ptrs_cluster[j];
+        std::string clustername = filename + std::to_string(j) + ".pcd";
+        if(
+            pcl::io::savePCDFileASCII (
+                "/home/shivam/Projects/eYRC/catkin_ws/src/object_recognition/point_cloud/" + clustername,
+                *cloud_cluster_ptr
+            )>=0
+        )
+        {
+            std::cout << "Saved " << clustername << std::endl;
+        }
+        else
+        {
+            std::cout << "Not saved " << clustername << std::endl;
+        }
+    }
+    std::cout << "" << std::endl;
 }

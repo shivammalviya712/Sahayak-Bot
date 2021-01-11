@@ -1,0 +1,3 @@
+/home/shivam/Projects/eYRC/catkin_ws/src/object_recognition/src/build/CMakeFiles/rebuild_cache.dir
+/home/shivam/Projects/eYRC/catkin_ws/src/object_recognition/src/build/CMakeFiles/correspondence_grouping.dir
+/home/shivam/Projects/eYRC/catkin_ws/src/object_recognition/src/build/CMakeFiles/edit_cache.dir

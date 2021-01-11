@@ -37,6 +37,7 @@ private:
     std::string _pc_topic;
     ros::Subscriber _pc_sub;
     pcl::PointCloud<PointType>::Ptr _pcl_pc_ptr;
+    std::vector<pcl::PointCloud<PointType>::Ptr> _ptrs_cluster;
     Filters _filters;
 
     // Methods
@@ -47,6 +48,7 @@ public:
     void analysis();
     void preprocess();
     void save_pc(pcl::PointCloud<PointType>::Ptr &pointcloud_ptr, std::string filename);
+    void save_pc(std::vector<pcl::PointCloud<PointType>::Ptr> &ptrs_cluster, std::string filename);
 };
 
 #endif
