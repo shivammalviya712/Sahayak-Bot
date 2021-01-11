@@ -1,6 +1,17 @@
 cmake_minimum_required(VERSION 3.0.2)
 project(object_recognition)
 
+
+find_package(PCL 1.8 REQUIRED)
+include_directories(${PCL_INCLUDE_DIRS})
+link_directories(${PCL_LIBRARY_DIRS})
+add_definitions(${PCL_DEFINITIONS})
+
+find_package(cmake_modules REQUIRED)
+find_package(Eigen3 REQUIRED)
+include_directories(${EIGEN3_INCLUDE_DIR})
+add_definitions(${EIGEN_DEFINITIONS})
+
 ## Compile as C++11, supported in ROS Kinetic and newer
 # add_compile_options(-std=c++11)
 
@@ -136,7 +147,7 @@ include_directories(
 ## Declare a C++ executable
 ## With catkin_make all packages are built within a single CMake context
 ## The recommended prefix ensures that target names across packages don't collide
-add_executable(${PROJECT_NAME}_main_node src/main.cpp src/camera.cpp src/filters.cpp)
+add_executable(${PROJECT_NAME}_main_node src/main.cpp src/camera.cpp src/filters.cpp src/recognition.cpp)
 
 ## Rename C++ executable without prefix
 ## The above recommended prefix causes long target names, the following renames the
@@ -149,9 +160,7 @@ add_executable(${PROJECT_NAME}_main_node src/main.cpp src/camera.cpp src/filters
 # add_dependencies(${PROJECT_NAME}_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 
 ## Specify libraries to link a library or executable target against
-target_link_libraries(${PROJECT_NAME}_main_node
-  ${catkin_LIBRARIES}
-)
+target_link_libraries(${PROJECT_NAME}_main_node ${catkin_LIBRARIES} ${PCL_LIBRARIES} )
 
 #############
 ## Install ##

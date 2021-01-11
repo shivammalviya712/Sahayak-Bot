@@ -14,7 +14,7 @@ Author: eYRC_SB_363
 
 namespace CameraSettings::Filters::VoxelFilter
 {
-    std::vector<float> leaf_size{0.02f, 0.02f, 0.02f};
+    std::vector<float> leaf_size{0.003f, 0.003f, 0.003f};
 }
 
 namespace CameraSettings::Filters::CropboxFilter

@@ -16,6 +16,7 @@ Author: eYRC_SB_363
 
 // My header files
 #include <object_recognition/camera.hpp>
+#include <object_recognition/recognition.hpp>
 
 int main(int argc, char **argv);
 

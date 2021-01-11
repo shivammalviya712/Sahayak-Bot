@@ -64,7 +64,7 @@ void Camera::save_pc(pcl::PointCloud<PointType>::Ptr &pointcloud_ptr, std::strin
 {
     if(
         pcl::io::savePCDFileASCII (
-            "/home/shivam/Projects/eYRC/catkin_ws/src/object_recognition/point_cloud/" + filename,
+            "/home/raj/catkin_ws/src/SBRepo/object_recognition/point_cloud/" + filename,
             *_pcl_pc_ptr
         )>=0
     )
