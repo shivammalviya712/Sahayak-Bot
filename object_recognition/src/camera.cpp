@@ -11,6 +11,7 @@ Camera::Camera(ros::NodeHandle node_handle)
     _pc_topic = "camera2/depth/points2";
     _pcl_pc_ptr.reset(new pcl::PointCloud<PointType>());
     _pc_sub = _node_handle.subscribe(_pc_topic, 10, &Camera::pc_callback, this);
+    _centroid_pub = _node_handle.advertise<object_recognition::ObjectPose>("detection_info", 10);
 }
 
 Camera::~Camera() {}
@@ -54,15 +55,15 @@ void Camera::preprocess()
     // Save
     save_pc(_pcl_pc_ptr, "after_ransac");
 
-    // Clustering
-    _ptrs_cluster = _filters.cluster_filter(
-        _pcl_pc_ptr,
-        CameraSettings::Filters::ClusterFilter::tolerance,
-        CameraSettings::Filters::ClusterFilter::min_cluster_size,
-        CameraSettings::Filters::ClusterFilter::max_cluster_size
-    );
-    // Save
-    save_pc(_ptrs_cluster, "after_cluster");
+    // // Clustering
+    // _ptrs_cluster = _filters.cluster_filter(
+    //     _pcl_pc_ptr,
+    //     CameraSettings::Filters::ClusterFilter::tolerance,
+    //     CameraSettings::Filters::ClusterFilter::min_cluster_size,
+    //     CameraSettings::Filters::ClusterFilter::max_cluster_size
+    // );
+    // // Save
+    // save_pc(_ptrs_cluster, "after_cluster");
 
 }
 
@@ -115,4 +116,29 @@ void Camera::save_pc(std::vector<pcl::PointCloud<PointType>::Ptr> &ptrs_cluster,
         }
     }
     std::cout << "" << std::endl;
+}
+
+void Camera::detect() 
+{
+    std::vector<std::vector<float>> centroids;
+    centroids = recognizer.recognize_objects(_pcl_pc_ptr);
+
+    object_recognition::ObjectPose object_pose;
+    object_pose.name = "Coke can";
+    object_pose.pose.pose.position.x = centroids[0][0];
+    object_pose.pose.pose.position.y = centroids[0][1];
+    object_pose.pose.pose.position.z = centroids[0][2];
+    _centroid_pub.publish(object_pose);
+
+    object_pose.name = "Battery";
+    object_pose.pose.pose.position.x = centroids[1][0];
+    object_pose.pose.pose.position.y = centroids[1][1];
+    object_pose.pose.pose.position.z = centroids[1][2];
+    _centroid_pub.publish(object_pose);
+
+    object_pose.name = "Glue";
+    object_pose.pose.pose.position.x = centroids[2][0];
+    object_pose.pose.pose.position.y = centroids[2][1];
+    object_pose.pose.pose.position.z = centroids[2][2];
+    _centroid_pub.publish(object_pose);
 }

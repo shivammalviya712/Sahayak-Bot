@@ -26,6 +26,8 @@ Author: eYRC_SB_363
 
 // My header files
 #include <object_recognition/filters.hpp>
+#include <object_recognition/recognition.hpp>
+#include <object_recognition/ObjectPose.h>  
 
 typedef pcl::PointXYZRGB PointType;
 
@@ -36,9 +38,11 @@ private:
     ros::NodeHandle _node_handle;
     std::string _pc_topic;
     ros::Subscriber _pc_sub;
+    ros::Publisher _centroid_pub;
     pcl::PointCloud<PointType>::Ptr _pcl_pc_ptr;
     std::vector<pcl::PointCloud<PointType>::Ptr> _ptrs_cluster;
     Filters _filters;
+    Recognition recognizer;
 
     // Methods
 public:
@@ -49,6 +53,7 @@ public:
     void preprocess();
     void save_pc(pcl::PointCloud<PointType>::Ptr &pointcloud_ptr, std::string filename);
     void save_pc(std::vector<pcl::PointCloud<PointType>::Ptr> &ptrs_cluster, std::string filename);
+    void detect();
 };
 
 #endif

@@ -28,6 +28,7 @@ Author: eYRC_SB_363
 #include <pcl/kdtree/impl/kdtree_flann.hpp>
 #include <pcl/common/transforms.h>
 #include <pcl/console/parse.h>
+#include <pcl/common/centroid.h>
 
 typedef pcl::Normal NormalType;
 typedef pcl::ReferenceFrame RFType;
@@ -44,21 +45,23 @@ private:
     float _descr_rad = 0.02f;
     float _cg_size = 0.01f;
     float _cg_thresh = 5.0f;
-    pcl::PointCloud<PointType>::Ptr _model;
-    pcl::PointCloud<PointType>::Ptr _model_keypoints;
-    pcl::PointCloud<NormalType>::Ptr _model_normals;
-    pcl::PointCloud<DescriptorType>::Ptr _model_descriptors;
-    pcl::PointCloud<PointType>::Ptr _scene;
-    pcl::PointCloud<PointType>::Ptr _scene_keypoints;
-    pcl::PointCloud<NormalType>::Ptr _scene_normals;
-    pcl::PointCloud<DescriptorType>::Ptr _scene_descriptors;
+    std::string _can_filepath;
+    std::string _battery_filepath;
+    std::string _glue_filepath;
+    pcl::PointCloud<PointType>::Ptr _scene_ptr;
+    pcl::PointCloud<PointType>::Ptr _scene_keypoints_ptr;
+    pcl::PointCloud<NormalType>::Ptr _scene_normals_ptr;
+    pcl::PointCloud<DescriptorType>::Ptr _scene_descriptors_ptr;
+
     // Methods
 public:
-    Recognition(
-        std::string model_filename,
-        std::string scene_filename);
+    Recognition();
     ~Recognition();
-    void pointcloud_to_centroid();
+    std::vector<std::vector<float>> recognize_objects(pcl::PointCloud<PointType>::Ptr &scene_ptr);
+    // TODO: There might be better method to return this with pointer
+    std::vector<float>  get_pc_centroid(
+        pcl::PointCloud<PointType>::Ptr &model_ptr
+    );
     pcl::PointCloud<NormalType>::Ptr compute_normals(
         pcl::PointCloud<PointType>::Ptr &pointcloud_ptr,
         int k_nearest_neighbour
@@ -109,7 +112,6 @@ public:
         float gc_size,
         float threshold
     );
-
     void result_analysis(
         std::vector<Eigen::Matrix4f, Eigen::aligned_allocator<Eigen::Matrix4f>> rototranslations,
         std::vector<pcl::Correspondences> clustered_corrs
@@ -122,5 +124,9 @@ public:
         std::vector<Eigen::Matrix4f, Eigen::aligned_allocator<Eigen::Matrix4f>> rototranslations,
         std::vector<pcl::Correspondences> clustered_corrs
     );
+    pcl::PointCloud<PointType>::Ptr load_from_pcd(std::string &filepath);
+    void save_to_pcd(pcl::PointCloud<PointType>::Ptr &pointcloud_ptr, std::string &filepath);
+    pcl::PointCloud<PointType>::Ptr center_pointcloud(pcl::PointCloud<PointType>::Ptr &pointcloud_ptr);
+    void center_n_save(std::string &input_filepath, std::string &output_filepath);
 };
 #endif
