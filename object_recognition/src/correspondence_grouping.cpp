@@ -366,7 +366,7 @@ int main(int argc, char *argv[])
     pcl::PointCloud<PointType>::Ptr off_scene_model(new pcl::PointCloud<PointType>());
     pcl::PointCloud<PointType>::Ptr off_scene_model_keypoints(new pcl::PointCloud<PointType>());
 
-    if (show_correspondences_ || show_keypoints_)
+    if (true)
     {
         //  We are translating the model so that it doesn't end in the middle of the scene representation
         pcl::transformPointCloud(*model, *off_scene_model, Eigen::Vector3f(-1, 0, 0), Eigen::Quaternionf(1, 0, 0, 0));
@@ -376,7 +376,7 @@ int main(int argc, char *argv[])
         viewer.addPointCloud(off_scene_model, off_scene_model_color_handler, "off_scene_model");
     }
 
-    if (show_keypoints_)
+    if (true)
     {
         pcl::visualization::PointCloudColorHandlerCustom<PointType> scene_keypoints_color_handler(scene_keypoints, 0, 0, 255);
         viewer.addPointCloud(scene_keypoints, scene_keypoints_color_handler, "scene_keypoints");
@@ -398,7 +398,7 @@ int main(int argc, char *argv[])
         pcl::visualization::PointCloudColorHandlerCustom<PointType> rotated_model_color_handler(rotated_model, 255, 0, 0);
         viewer.addPointCloud(rotated_model, rotated_model_color_handler, ss_cloud.str());
 
-        if (show_correspondences_)
+        if (true)
         {
             for (std::size_t j = 0; j < clustered_corrs[i].size(); ++j)
             {

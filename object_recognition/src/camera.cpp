@@ -28,12 +28,12 @@ void Camera::preprocess()
     save_pc(_pcl_pc_ptr, "raw");
     
     // Voxel Filter
-    _pcl_pc_ptr = _filters.voxel_filter(
-        _pcl_pc_ptr,
-        CameraSettings::Filters::VoxelFilter::leaf_size
-    );
+    // _pcl_pc_ptr = _filters.voxel_filter(
+    //     _pcl_pc_ptr,
+    //     CameraSettings::Filters::VoxelFilter::leaf_size
+    // );
     // Save
-    save_pc(_pcl_pc_ptr, "after_voxel");
+    // save_pc(_pcl_pc_ptr, "after_voxel");
 
     // Cropbox Filter
     _pcl_pc_ptr = _filters.cropbox_filter(
