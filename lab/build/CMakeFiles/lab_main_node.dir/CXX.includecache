@@ -43,6 +43,8 @@ pcl/common/transforms.h
 -
 pcl/console/parse.h
 -
+pcl/common/centroid.h
+-
 
 /home/shivam/Projects/eYRC/catkin_ws/src/lab/src/main.cpp
 recognition.hpp

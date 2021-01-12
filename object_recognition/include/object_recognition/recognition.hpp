@@ -15,13 +15,13 @@ Author: eYRC_SB_363
 
 // PCL Libraries
 #include <pcl/io/pcd_io.h>
-#include <pcl/recognition/cg/hough_3d.h>
 #include <pcl/point_cloud.h>
 #include <pcl/correspondence.h>
 #include <pcl/features/normal_3d_omp.h>
 #include <pcl/features/shot_omp.h>
 #include <pcl/features/board.h>
 #include <pcl/filters/uniform_sampling.h>
+#include <pcl/recognition/cg/hough_3d.h>
 #include <pcl/recognition/cg/geometric_consistency.h>
 #include <pcl/visualization/pcl_visualizer.h>
 #include <pcl/kdtree/kdtree_flann.h>
@@ -87,9 +87,40 @@ public:
         std::vector<Eigen::Matrix4f, Eigen::aligned_allocator<Eigen::Matrix4f>>,
         std::vector<pcl::Correspondences>
     > hough3D(
-        pcl::CorrespondencesPtr &model_scene_corrs,
+        pcl::CorrespondencesPtr &correspondences_ptr,
+        pcl::PointCloud<PointType>::Ptr &model_ptr,
+        pcl::PointCloud<PointType>::Ptr &model_keypoints_ptr,
+        pcl::PointCloud<NormalType>::Ptr &model_normals_ptr,
+        pcl::PointCloud<PointType>::Ptr &scene_ptr,
+        pcl::PointCloud<PointType>::Ptr &scene_keypoints_ptr,
+        pcl::PointCloud<NormalType>::Ptr &scene_normals_ptr,
         float bin_size,
         float threshold
+    );
+    std::tuple<
+    std::vector<Eigen::Matrix4f, Eigen::aligned_allocator<Eigen::Matrix4f>>,
+    std::vector<pcl::Correspondences>
+    > geometric_consistency(
+        pcl::CorrespondencesPtr &correspondences_ptr,
+        pcl::PointCloud<PointType>::Ptr &model_keypoints_ptr,
+        pcl::PointCloud<NormalType>::Ptr &model_normals_ptr,
+        pcl::PointCloud<PointType>::Ptr &scene_keypoints_ptr,
+        pcl::PointCloud<NormalType>::Ptr &scene_normals_ptr,
+        float gc_size,
+        float threshold
+    );
+
+    void result_analysis(
+        std::vector<Eigen::Matrix4f, Eigen::aligned_allocator<Eigen::Matrix4f>> rototranslations,
+        std::vector<pcl::Correspondences> clustered_corrs
+    );
+    void visualization(
+        pcl::PointCloud<PointType>::Ptr &model_ptr,
+        pcl::PointCloud<PointType>::Ptr &model_keypoints_ptr,
+        pcl::PointCloud<PointType>::Ptr &scene_ptr,
+        pcl::PointCloud<PointType>::Ptr &scene_keypoints_ptr,
+        std::vector<Eigen::Matrix4f, Eigen::aligned_allocator<Eigen::Matrix4f>> rototranslations,
+        std::vector<pcl::Correspondences> clustered_corrs
     );
 };
 #endif

@@ -5,103 +5,130 @@ Author: eYRC_SB_363
 #include <recognition.hpp>
 
 Recognition::Recognition(
-    std::string model_filename,
     std::string scene_filename
 )
 {
-    _model.reset(new pcl::PointCloud<PointType>());
-    _model_keypoints.reset(new pcl::PointCloud<PointType>());
-    _scene.reset(new pcl::PointCloud<PointType>());
-    _scene_keypoints.reset(new pcl::PointCloud<PointType>());
-    _model_normals.reset(new pcl::PointCloud<NormalType>());
-    _scene_normals.reset(new pcl::PointCloud<NormalType>());
-    _model_descriptors.reset(new pcl::PointCloud<DescriptorType>());
-    _scene_descriptors.reset(new pcl::PointCloud<DescriptorType>());
-    // Load cloud (Just for initial period!)
-    if (pcl::io::loadPCDFile(model_filename, *_model) < 0)
-    {
-        std::cout << "Error loading model cloud." << std::endl;
-    }
-    if (pcl::io::loadPCDFile(scene_filename, *_scene) < 0)
-    {
-        std::cout << "Error loading scene cloud." << std::endl;
-    }
+    _can_filepath = "/home/shivam/Projects/eYRC/catkin_ws/src/object_recognition/point_cloud/centered_can.pcd";
+    _battery_filepath = "/home/shivam/Projects/eYRC/catkin_ws/src/object_recognition/point_cloud/centered_battery.pcd";
+    _glue_filepath = "/home/shivam/Projects/eYRC/catkin_ws/src/object_recognition/point_cloud/centered_glue.pcd";
+
+    // Temporarly loading from the file
+    _scene_ptr = load_from_pcd(scene_filename);
+    _scene_normals_ptr = compute_normals(_scene_ptr, 10);;
+    _scene_keypoints_ptr = extract_keypoints(_scene_ptr, _scene_ss);
+    _scene_descriptors_ptr = compute_descriptors(
+        _scene_ptr,
+        _scene_keypoints_ptr,
+        _scene_normals_ptr,
+        _descr_rad
+    );
 }
 
 Recognition::~Recognition() {}
 
-void Recognition::pointcloud_to_centroid()
+void Recognition::recognize_objects()
 {
-    std::cout << "Total points in model: " << _model->size() << std::endl;
-    std::cout << "Total points in scene: " << _scene->size() << std::endl;
+    pcl::PointCloud<PointType>::Ptr model_ptr;
+    Eigen::Vector4f model_centroid;
+    std::vector<float> detected_centroid;
+
+    model_ptr = load_from_pcd(_can_filepath);
+    detected_centroid = get_pc_centroid(model_ptr);
+    // pcl::compute3DCentroid(*model_ptr, model_centroid);
+    printf (
+        "Centroid of can = < %0.3f, %0.3f, %0.3f >\n\n",
+        detected_centroid[0],
+        detected_centroid[1],
+        detected_centroid[2]
+    );
+
+    model_ptr = load_from_pcd(_battery_filepath);
+    // pcl::compute3DCentroid(*model_ptr, model_centroid);
+    printf (
+        "Centroid of battery = < %0.3f, %0.3f, %0.3f >\n\n",
+        detected_centroid[0],
+        detected_centroid[1],
+        detected_centroid[2]
+    );
+
+    model_ptr = load_from_pcd(_glue_filepath);
+    // pcl::compute3DCentroid(*model_ptr, model_centroid);
+    printf (
+        "Centroid of glue = < %0.3f, %0.3f, %0.3f >\n\n",
+        detected_centroid[0],
+        detected_centroid[1],
+        detected_centroid[2]
+    );
+}
+
+std::vector<float> Recognition::get_pc_centroid(
+    pcl::PointCloud<PointType>::Ptr &model_ptr
+)
+{
+    std::cout << "Total points in model: " << model_ptr->size() << std::endl;
+    std::cout << "Total points in scene: " << _scene_ptr->size() << std::endl;
+
+    // Define variables
+    pcl::PointCloud<PointType>::Ptr model_keypoints_ptr;
+    pcl::PointCloud<NormalType>::Ptr model_normals_ptr;
+    pcl::PointCloud<DescriptorType>::Ptr model_descriptors_ptr;
 
     //  Compute Normals
-    _model_normals = compute_normals(_model, 10);
-    _scene_normals = compute_normals(_scene, 10);
-    
+    model_normals_ptr = compute_normals(model_ptr, 10);
+
     // Extract keypoints
-    _model_keypoints = extract_keypoints(_model, _model_ss);
-    _scene_keypoints = extract_keypoints(_scene, _scene_ss);
-    std::cout << "Total points in model keypoints: " << _model_keypoints->size() << std::endl;
-    std::cout << "Total points in scene keypoints: " << _scene_keypoints->size() << std::endl;
+    model_keypoints_ptr = extract_keypoints(model_ptr, _model_ss);
+    std::cout << "Total points in model keypoints: " << model_keypoints_ptr->size() << std::endl;
+    std::cout << "Total points in scene keypoints: " << _scene_keypoints_ptr->size() << std::endl;
 
     //  Compute Descriptor
-    _model_descriptors = compute_descriptors(
-        _model,
-        _model_keypoints,
-        _model_normals,
-        _descr_rad
-    );
-    _scene_descriptors = compute_descriptors(
-        _scene,
-        _scene_keypoints,
-        _scene_normals,
+    model_descriptors_ptr = compute_descriptors(
+        model_ptr,
+        model_keypoints_ptr,
+        model_normals_ptr,
         _descr_rad
     );
 
     //  Find correspondence
     pcl::CorrespondencesPtr correspondences_ptr = find_correspondences(
-        _model_descriptors,
-        _scene_descriptors
+        model_descriptors_ptr,
+        _scene_descriptors_ptr
     );
     std::cout << "Correspondences found: " << correspondences_ptr->size() << std::endl;
 
     // Clustering
     std::vector<Eigen::Matrix4f, Eigen::aligned_allocator<Eigen::Matrix4f>> rototranslations;
     std::vector<pcl::Correspondences> clustered_corrs;
-    // tie(rototranslations, clustered_corrs) = hough3D(
-    //     correspondences_ptr,
-    //     _model,
-    //     _model_keypoints,
-    //     _model_normals,
-    //     _scene,
-    //     _scene_keypoints,
-    //     _scene_normals,
-    //     _cg_size,
-    //     _cg_thresh
-    // );
     tie(rototranslations, clustered_corrs) = geometric_consistency(
         correspondences_ptr,
-        _model_keypoints,
-        _model_normals,
-        _scene_keypoints,
-        _scene_normals,
+        model_keypoints_ptr,
+        model_normals_ptr,
+        _scene_keypoints_ptr,
+        _scene_normals_ptr,
         _cg_size,
         _cg_thresh
     );
+    std::cout << "Instances found: " << rototranslations.size() << std::endl;
 
     // Results
-    result_analysis(rototranslations, clustered_corrs);
+    // result_analysis(rototranslations, clustered_corrs);
 
     // Visualisation
     visualization(
-        _model,
-        _model_keypoints,
-        _scene,
-        _scene_keypoints,
+        model_ptr,
+        model_keypoints_ptr,
+        _scene_ptr,
+        _scene_keypoints_ptr,
         rototranslations,
         clustered_corrs
     );
+
+    std::vector<float> centroid;
+    centroid.push_back((rototranslations[0].block<3,1>(0, 3))(0));
+    centroid.push_back((rototranslations[0].block<3,1>(0, 3))(1));
+    centroid.push_back((rototranslations[0].block<3,1>(0, 3))(2));
+
+    return centroid;
 }
 
 pcl::PointCloud<NormalType>::Ptr Recognition::compute_normals(
@@ -167,14 +194,14 @@ pcl::CorrespondencesPtr Recognition::find_correspondences(
     {
         std::vector<int> neigh_indices(1);
         std::vector<float> neigh_sqr_dists(1);
-        if (!std::isfinite(_scene_descriptors->at(i).descriptor[0])) // skipping NaNs
+        if (!std::isfinite(_scene_descriptors_ptr->at(i).descriptor[0])) // skipping NaNs
         {
             continue;
         }
         int found_neighs = match_search.nearestKSearch(
-            _scene_descriptors->at(i), 1, neigh_indices, neigh_sqr_dists
+            _scene_descriptors_ptr->at(i), 1, neigh_indices, neigh_sqr_dists
         );
-        if (found_neighs == 1 && neigh_sqr_dists[0] < 0.25f) 
+        if (found_neighs == 1 && neigh_sqr_dists[0] < 0.25f)
         {
             pcl::Correspondence corr(neigh_indices[0], static_cast<int>(i), neigh_sqr_dists[0]);
             correspondences_ptr->push_back(corr);
@@ -363,5 +390,60 @@ void Recognition::visualization(
     }
 }
 
+pcl::PointCloud<PointType>::Ptr Recognition::load_from_pcd(std::string &filepath)
+{
+    pcl::PointCloud<PointType>::Ptr pointcloud_ptr(new pcl::PointCloud<PointType>); 
+    if (pcl::io::loadPCDFile(filepath, *pointcloud_ptr) < 0)
+    {
+        std::cout << "Error loading file " + filepath <<  std::endl;
+    }
 
+    return pointcloud_ptr; 
+}
 
+void Recognition::save_to_pcd(pcl::PointCloud<PointType>::Ptr &pointcloud_ptr, std::string &filepath)
+{
+    if(pcl::io::savePCDFileASCII (filepath, *pointcloud_ptr)>=0)
+    {
+        std::cout << "Saved " << filepath << "\n" << std::endl;
+    }
+    else
+    {
+        std::cout << "Not saved " << filepath << "\n" << std::endl;
+    }
+}
+
+pcl::PointCloud<PointType>::Ptr Recognition::center_pointcloud(pcl::PointCloud<PointType>::Ptr &pointcloud_ptr)
+{
+    pcl::PointCloud<PointType>::Ptr transformed_cloud_ptr(new pcl::PointCloud<PointType>);
+    
+    // Compute centroid
+    Eigen::Vector4f centroid;
+    pcl::compute3DCentroid(*pointcloud_ptr, centroid);
+    std::cout << "Computed centroid is: "
+              << centroid[0] << " "
+              << centroid[1] << " "
+              << centroid[2] << " "
+              << centroid[3] << " "
+              << std::endl;
+    
+    // Transform
+    Eigen::Affine3f transform = Eigen::Affine3f::Identity();;
+    transform.translation() << -centroid[0], -centroid[1], -centroid[2];
+    std::cout << "Transformation matrix: " << "\n"
+              << transform.matrix() << "\n"
+              << std::endl;
+
+    pcl::transformPointCloud(*pointcloud_ptr, *transformed_cloud_ptr, transform);
+
+    return transformed_cloud_ptr;
+}
+
+void Recognition::center_n_save(
+    std::string &input_filepath, std::string &output_filepath
+)
+{
+    pcl::PointCloud<PointType>::Ptr input_pc_ptr = load_from_pcd(input_filepath);
+    pcl::PointCloud<PointType>::Ptr output_pc_ptr = center_pointcloud(input_pc_ptr);
+    save_to_pcd(output_pc_ptr, output_filepath);
+}
