@@ -8,9 +8,9 @@ Recognition::Recognition(
     std::string scene_filename
 )
 {
-    _can_filepath = "/home/shivam/Projects/eYRC/catkin_ws/src/object_recognition/point_cloud/centered_can.pcd";
-    _battery_filepath = "/home/shivam/Projects/eYRC/catkin_ws/src/object_recognition/point_cloud/centered_battery.pcd";
-    _glue_filepath = "/home/shivam/Projects/eYRC/catkin_ws/src/object_recognition/point_cloud/centered_glue.pcd";
+    _can_filepath = "/home/shivam/Projects/eYRC/catkin_ws/src/object_recognition/point_cloud/can.pcd";
+    _battery_filepath = "/home/shivam/Projects/eYRC/catkin_ws/src/object_recognition/point_cloud/battery.pcd";
+    _glue_filepath = "/home/shivam/Projects/eYRC/catkin_ws/src/object_recognition/point_cloud/glue.pcd";
 
     // Temporarly loading from the file
     _scene_ptr = load_from_pcd(scene_filename);
@@ -32,9 +32,14 @@ void Recognition::recognize_objects()
     Eigen::Vector4f model_centroid;
     std::vector<float> detected_centroid;
 
+    // Can
     model_ptr = load_from_pcd(_can_filepath);
     detected_centroid = get_pc_centroid(model_ptr);
-    // pcl::compute3DCentroid(*model_ptr, model_centroid);
+    pcl::compute3DCentroid(*model_ptr, model_centroid);
+    for (int i=0; i<detected_centroid.size();i++)
+    {
+        detected_centroid[i] += model_centroid[i];
+    }
     printf (
         "Centroid of can = < %0.3f, %0.3f, %0.3f >\n\n",
         detected_centroid[0],
@@ -43,7 +48,12 @@ void Recognition::recognize_objects()
     );
 
     model_ptr = load_from_pcd(_battery_filepath);
-    // pcl::compute3DCentroid(*model_ptr, model_centroid);
+    detected_centroid = get_pc_centroid(model_ptr);
+    pcl::compute3DCentroid(*model_ptr, model_centroid);
+    for (int i=0; i<detected_centroid.size();i++)
+    {
+        detected_centroid[i] += model_centroid[i];
+    }
     printf (
         "Centroid of battery = < %0.3f, %0.3f, %0.3f >\n\n",
         detected_centroid[0],
@@ -52,7 +62,12 @@ void Recognition::recognize_objects()
     );
 
     model_ptr = load_from_pcd(_glue_filepath);
-    // pcl::compute3DCentroid(*model_ptr, model_centroid);
+    detected_centroid = get_pc_centroid(model_ptr);
+    pcl::compute3DCentroid(*model_ptr, model_centroid);
+    for (int i=0; i<detected_centroid.size();i++)
+    {
+        detected_centroid[i] += model_centroid[i];
+    }
     printf (
         "Centroid of glue = < %0.3f, %0.3f, %0.3f >\n\n",
         detected_centroid[0],

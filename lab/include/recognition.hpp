@@ -114,7 +114,6 @@ public:
         float gc_size,
         float threshold
     );
-
     void result_analysis(
         std::vector<Eigen::Matrix4f, Eigen::aligned_allocator<Eigen::Matrix4f>> rototranslations,
         std::vector<pcl::Correspondences> clustered_corrs
