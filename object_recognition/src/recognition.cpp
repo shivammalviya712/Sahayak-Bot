@@ -6,9 +6,9 @@ Author: eYRC_SB_363
 
 Recognition::Recognition()
 {
-    _files.push_back("/home/shivam/Projects/eYRC/catkin_ws/src/object_recognition/point_cloud/can.pcd");
-    _files.push_back("/home/shivam/Projects/eYRC/catkin_ws/src/object_recognition/point_cloud/battery.pcd");
-    _files.push_back("/home/shivam/Projects/eYRC/catkin_ws/src/object_recognition/point_cloud/glue.pcd");
+    _files.push_back("/home/shivam/Projects/eYRC/catkin_ws/src/object_recognition/point_cloud/can1.pcd");
+    _files.push_back("/home/shivam/Projects/eYRC/catkin_ws/src/object_recognition/point_cloud/battery1.pcd");
+    _files.push_back("/home/shivam/Projects/eYRC/catkin_ws/src/object_recognition/point_cloud/glue1.pcd");
 }
 
 Recognition::~Recognition() {}
@@ -43,6 +43,10 @@ std::vector<pcl::PointCloud<PointType>::Ptr> Recognition::recognize_objects(
         object = -1;
         for (int j=0; j<_files.size(); j++)
         {
+            if (_files[j]=="\0")
+            {
+                continue;
+            }
             model_ptr = load_from_pcd(_files[j]);
             curr_correspondence_size = get_correspondence_size(
                 model_ptr,
@@ -61,6 +65,7 @@ std::vector<pcl::PointCloud<PointType>::Ptr> Recognition::recognize_objects(
         if (object>=0)
         {
             ptrs_object_cluster[object] = cluster_ptr;
+            _files[object] = "\0"; 
             std::cout << i << "th cluster matches with " << object << "th pointcloud" << std::endl;
         }
         else 
