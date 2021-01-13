@@ -21,10 +21,10 @@ class Manipulator:
 
     # Planning groups
     arm_group_name = 'arm'
+    gripper_group_name = 'gripper'
     self.arm_group = moveit_commander.MoveGroupCommander(arm_group_name)
-    # gripper_group_name = 'gripper'
-    # self.gripper_group = moveit_commander.MoveGroupCommander(
-    #     gripper_group_name)
+    self.gripper_group = moveit_commander.MoveGroupCommander(
+        gripper_group_name)
 
     # Publish trajectories for RViz to visualize
     self.display_trajectory_publisher = rospy.Publisher(
@@ -39,12 +39,12 @@ class Manipulator:
                   str(self.scene.get_known_object_names()))
     rospy.loginfo('Arm end effector: ' +
                   str(self.arm_group.get_end_effector_link()))
-    # rospy.loginfo('Gripper has end effector: ' +
-    #               str(self.gripper_group.has_end_effector_link()))
+    rospy.loginfo('Gripper has end effector: ' +
+                  str(self.gripper_group.has_end_effector_link()))
     rospy.loginfo("Robot.get_current_state(): " +
                   str(self.robot.get_current_state()))
-    # rospy.loginfo("gripper_group.get_current_goint_values(): " +
-    #               str(self.gripper_group.get_current_joint_values()))
+    rospy.loginfo("gripper_group.get_current_goint_values(): " +
+                  str(self.gripper_group.get_current_joint_values()))
     rospy.loginfo("arm_group.get_current_goint_values(): " +
                   str(self.arm_group.get_current_joint_values()))
     rospy.loginfo('Setup complete')
