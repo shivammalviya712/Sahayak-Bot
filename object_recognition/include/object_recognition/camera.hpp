@@ -14,6 +14,9 @@ Author: eYRC_SB_363
 #include <ros/ros.h>
 #include <ros/console.h>
 #include <sensor_msgs/PointCloud2.h>
+#include <tf2_ros/transform_listener.h>
+#include <tf2_geometry_msgs/tf2_geometry_msgs.h>
+#include <geometry_msgs/PoseStamped.h>
 
 //PCL Libraries
 #include <pcl_ros/point_cloud.h>
@@ -39,8 +42,11 @@ private:
     std::string _pc_topic;
     ros::Subscriber _pc_sub;
     ros::Publisher _centroid_pub;
+    ros::Publisher _centroid_pub_rviz;
     pcl::PointCloud<PointType>::Ptr _pcl_pc_ptr;
     std::vector<pcl::PointCloud<PointType>::Ptr> _ptrs_cluster;
+    tf2_ros::Buffer _tfBuffer;
+    tf2_ros::TransformListener* _tfListenerPtr;
     Filters _filters;
     Recognition recognizer;
 

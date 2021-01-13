@@ -12,6 +12,9 @@ Camera::Camera(ros::NodeHandle node_handle)
     _pcl_pc_ptr.reset(new pcl::PointCloud<PointType>());
     _pc_sub = _node_handle.subscribe(_pc_topic, 10, &Camera::pc_callback, this);
     _centroid_pub = _node_handle.advertise<object_recognition::ObjectPose>("detection_info", 10);
+    _centroid_pub_rviz = _node_handle.advertise<geometry_msgs::PoseStamped>("detection_info_rviz", 10);
+    
+    _tfListenerPtr = new tf2_ros::TransformListener(_tfBuffer);
 }
 
 Camera::~Camera() {}
@@ -80,7 +83,7 @@ void Camera::save_pc(pcl::PointCloud<PointType>::Ptr &pointcloud_ptr, std::strin
     filename = filename + ".pcd";
     if(
         pcl::io::savePCDFileASCII (
-            "/home/shivam/Projects/eYRC/catkin_ws/src/object_recognition/point_cloud/" + filename,
+            "/home/raj/catkin_ws/src/SBRepo/object_recognition/point_cloud/" + filename,
             *_pcl_pc_ptr
         )>=0
     )
@@ -103,7 +106,7 @@ void Camera::save_pc(std::vector<pcl::PointCloud<PointType>::Ptr> &ptrs_cluster,
         std::string clustername = filename + std::to_string(j) + ".pcd";
         if(
             pcl::io::savePCDFileASCII (
-                "/home/shivam/Projects/eYRC/catkin_ws/src/object_recognition/point_cloud/" + clustername,
+                "/home/raj/catkin_ws/src/SBRepo/object_recognition/point_cloud/" + clustername,
                 *cloud_cluster_ptr
             )>=0
         )
@@ -120,25 +123,77 @@ void Camera::save_pc(std::vector<pcl::PointCloud<PointType>::Ptr> &ptrs_cluster,
 
 void Camera::detect() 
 {
+    bool debug = true;
+
     std::vector<std::vector<float>> centroids;
     centroids = recognizer.recognize_objects(_pcl_pc_ptr);
-
+    std::string target_frame = "base_link";
+    std::string source_frame = "camera_depth_frame2";
+    geometry_msgs::TransformStamped transformStamped = _tfBuffer.lookupTransform(
+        target_frame, 
+        source_frame,
+        ros::Time(0)
+    );
+    geometry_msgs::PoseStamped object_pose_stamped;
+    object_pose_stamped.pose.orientation.x = 0;
+    object_pose_stamped.pose.orientation.y = 0;
+    object_pose_stamped.pose.orientation.z = 0;
+    object_pose_stamped.pose.orientation.w = 1;
     object_recognition::ObjectPose object_pose;
+
+    // Transform such that the pose is w.r.to the base link
+    // Reference: https://piazza.com/class/kftilbrk6dm7ea?cid=1120
+    object_pose_stamped.pose.position.x = centroids[0][0];
+    object_pose_stamped.pose.position.y = centroids[0][1];
+    object_pose_stamped.pose.position.z = centroids[0][2];
+    tf2::doTransform(
+        object_pose_stamped, 
+        object_pose_stamped, 
+        transformStamped
+    );
     object_pose.name = "Coke can";
-    object_pose.pose.pose.position.x = centroids[0][0];
-    object_pose.pose.pose.position.y = centroids[0][1];
-    object_pose.pose.pose.position.z = centroids[0][2];
+    object_pose.pose = object_pose_stamped;
+    _centroid_pub_rviz.publish(object_pose.pose);
     _centroid_pub.publish(object_pose);
+    if(debug){
+        char c;
+        cout << "Enter any character to continue: ";
+        cin >> c;
+    }
 
+    object_pose_stamped.pose.position.x = centroids[1][0];
+    object_pose_stamped.pose.position.y = centroids[1][1];
+    object_pose_stamped.pose.position.z = centroids[1][2];
+    tf2::doTransform(
+        object_pose_stamped, 
+        object_pose_stamped, 
+        transformStamped
+    );
     object_pose.name = "Battery";
-    object_pose.pose.pose.position.x = centroids[1][0];
-    object_pose.pose.pose.position.y = centroids[1][1];
-    object_pose.pose.pose.position.z = centroids[1][2];
+    object_pose.pose = object_pose_stamped;
+    _centroid_pub_rviz.publish(object_pose.pose);
     _centroid_pub.publish(object_pose);
+    if(debug){
+        char c;
+        cout << "Enter any character to continue: ";
+        cin >> c;
+    }
 
+    object_pose_stamped.pose.position.x = centroids[2][0];
+    object_pose_stamped.pose.position.y = centroids[2][1];
+    object_pose_stamped.pose.position.z = centroids[2][2];
+    tf2::doTransform(
+        object_pose_stamped, 
+        object_pose_stamped, 
+        transformStamped
+    );
     object_pose.name = "Glue";
-    object_pose.pose.pose.position.x = centroids[2][0];
-    object_pose.pose.pose.position.y = centroids[2][1];
-    object_pose.pose.pose.position.z = centroids[2][2];
+    object_pose.pose = object_pose_stamped;
+    _centroid_pub_rviz.publish(object_pose.pose);
     _centroid_pub.publish(object_pose);
+    if(debug){
+        char c;
+        cout << "Enter any character to continue: ";
+        cin >> c;
+    }
 }

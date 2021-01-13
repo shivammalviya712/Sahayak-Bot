@@ -6,9 +6,9 @@ Author: eYRC_SB_363
 
 Recognition::Recognition()
 {
-    _can_filepath = "/home/shivam/Projects/eYRC/catkin_ws/src/object_recognition/point_cloud/can.pcd";
-    _battery_filepath = "/home/shivam/Projects/eYRC/catkin_ws/src/object_recognition/point_cloud/battery.pcd";
-    _glue_filepath = "/home/shivam/Projects/eYRC/catkin_ws/src/object_recognition/point_cloud/glue.pcd";
+    _can_filepath = "/home/raj/catkin_ws/src/SBRepo/object_recognition/point_cloud/can.pcd";
+    _battery_filepath = "/home/raj/catkin_ws/src/SBRepo/object_recognition/point_cloud/battery.pcd";
+    _glue_filepath = "/home/raj/catkin_ws/src/SBRepo/object_recognition/point_cloud/glue.pcd";
 
     _scene_ptr.reset(new pcl::PointCloud<PointType>);
     _scene_keypoints_ptr.reset(new pcl::PointCloud<PointType>);
@@ -136,14 +136,14 @@ std::vector<float> Recognition::get_pc_centroid(
     // result_analysis(rototranslations, clustered_corrs);
 
     // Visualisation
-    visualization(
-        model_ptr,
-        model_keypoints_ptr,
-        _scene_ptr,
-        _scene_keypoints_ptr,
-        rototranslations,
-        clustered_corrs
-    );
+    // visualization(
+    //     model_ptr,
+    //     model_keypoints_ptr,
+    //     _scene_ptr,
+    //     _scene_keypoints_ptr,
+    //     rototranslations,
+    //     clustered_corrs
+    // );
 
     std::vector<float> centroid;
     centroid.push_back((rototranslations[0].block<3,1>(0, 3))(0));
