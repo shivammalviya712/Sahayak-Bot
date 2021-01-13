@@ -21,7 +21,6 @@ Author: eYRC_SB_363
 //PCL Libraries
 #include <pcl_ros/point_cloud.h>
 #include <pcl/point_types.h>
-#include <pcl/common/common.h>
 #include <pcl_conversions/pcl_conversions.h>
 #include <pcl/PCLPointCloud2.h>
 #include <pcl/conversions.h>
@@ -39,6 +38,7 @@ class Camera
 {
     // Attributes
 private:
+    std::string _pointcloud_dir="/home/shivam/Projects/eYRC/catkin_ws/src/object_recognition/point_cloud/";
     ros::NodeHandle _node_handle;
     std::string _pc_topic;
     ros::Subscriber _pc_sub;

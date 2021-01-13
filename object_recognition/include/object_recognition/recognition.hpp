@@ -29,6 +29,7 @@ Author: eYRC_SB_363
 #include <pcl/common/transforms.h>
 #include <pcl/console/parse.h>
 #include <pcl/common/centroid.h>
+#include <pcl/common/common.h>
 
 typedef pcl::Normal NormalType;
 typedef pcl::ReferenceFrame RFType;
@@ -39,6 +40,7 @@ class Recognition
 {
     // Attributes
 private:
+    std::string _pointcloud_dir = "/home/shivam/Projects/eYRC/catkin_ws/src/object_recognition/point_cloud/";
     float _model_ss = 0.01f;
     float _scene_ss = 0.03f;
     float _rf_rad = 0.015f;

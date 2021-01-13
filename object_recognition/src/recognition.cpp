@@ -6,17 +6,23 @@ Author: eYRC_SB_363
 
 Recognition::Recognition()
 {
-    _files.push_back("/home/raj/catkin_ws/src/SBRepo/object_recognition/point_cloud/can1.pcd");
-    _files.push_back("/home/raj/catkin_ws/src/SBRepo/object_recognition/point_cloud/battery1.pcd");
-    _files.push_back("/home/raj/catkin_ws/src/SBRepo/object_recognition/point_cloud/glue1.pcd");
+    // Filepath are in order in which they will be picked
+    // Google drive link to pointcloud of objects:
+    // https://drive.google.com/drive/u/0/folders/1wkK6srg9UCDvMrXZvNamSs43nYREz50v
+    _files.push_back(_pointcloud_dir+"/can1.pcd");
+    _files.push_back(_pointcloud_dir+"/battery1.pcd");
+    _files.push_back(_pointcloud_dir+"/glue1.pcd");
 }
 
+// Destructor
 Recognition::~Recognition() {}
 
+// Returns pointcloud cluster of the detected objects in order to be picked
 std::vector<pcl::PointCloud<PointType>::Ptr> Recognition::recognize_objects(
     std::vector<pcl::PointCloud<PointType>::Ptr> &ptrs_clusters
 )
 {
+    // Initialization
     std::vector<pcl::PointCloud<PointType>::Ptr> ptrs_object_cluster(_files.size());
     pcl::PointCloud<PointType>::Ptr cluster_ptr;
     pcl::PointCloud<PointType>::Ptr cluster_keypoints_ptr;
@@ -30,6 +36,7 @@ std::vector<pcl::PointCloud<PointType>::Ptr> Recognition::recognize_objects(
 
     for (int i=0; i<ptrs_clusters.size(); i++)
     {
+        // Loop for each cluster
         cluster_ptr = ptrs_clusters[i];
         cluster_normals_ptr = compute_normals(cluster_ptr, 10);
         cluster_keypoints_ptr = extract_keypoints(cluster_ptr, _scene_ss);
@@ -43,11 +50,13 @@ std::vector<pcl::PointCloud<PointType>::Ptr> Recognition::recognize_objects(
         object = -1;
         for (int j=0; j<_files.size(); j++)
         {
+            // Loop for each object
             if (_files[j]=="\0")
             {
                 continue;
             }
             model_ptr = load_from_pcd(_files[j]);
+            // Number of correspondence found
             curr_correspondence_size = get_correspondence_size(
                 model_ptr,
                 cluster_ptr,
@@ -55,6 +64,7 @@ std::vector<pcl::PointCloud<PointType>::Ptr> Recognition::recognize_objects(
                 cluster_normals_ptr,
                 cluster_descriptors_ptr
             );
+            // Choose the cluster with most number of correspondences
             if (max_correspondence_size < curr_correspondence_size)
             {
                 max_correspondence_size =  curr_correspondence_size;
@@ -62,6 +72,7 @@ std::vector<pcl::PointCloud<PointType>::Ptr> Recognition::recognize_objects(
             }
             std::cout << "\n" << std::endl;
         }
+        // Save the cluster in the vector according to its classification
         if (object>=0)
         {
             ptrs_object_cluster[object] = cluster_ptr;
@@ -74,9 +85,12 @@ std::vector<pcl::PointCloud<PointType>::Ptr> Recognition::recognize_objects(
         }
         std::cout << "\n\n" << std::endl;
     }
+
+    // Return clusters in the order to be picked
     return ptrs_object_cluster;
 }
 
+// Returns the size of correspondence found
 int Recognition::get_correspondence_size(
     pcl::PointCloud<PointType>::Ptr &model_ptr,
     pcl::PointCloud<PointType>::Ptr &cluster_ptr,
@@ -146,6 +160,7 @@ int Recognition::get_correspondence_size(
     return correspondences_ptr->size();
 }
 
+// Compute normals
 pcl::PointCloud<NormalType>::Ptr Recognition::compute_normals(
     pcl::PointCloud<PointType>::Ptr &pointcloud_ptr,
     int k_nearest_neighbour
@@ -161,6 +176,7 @@ pcl::PointCloud<NormalType>::Ptr Recognition::compute_normals(
     return pointcloud_normals_ptr;
 }
 
+// Extract keypoints
 pcl::PointCloud<PointType>::Ptr Recognition::extract_keypoints(
     pcl::PointCloud<PointType>::Ptr &pointcloud_ptr,
     float sampling_size
@@ -176,6 +192,7 @@ pcl::PointCloud<PointType>::Ptr Recognition::extract_keypoints(
     return pointcloud_keypoints_ptr;
 }
 
+// Compute descriptors
 pcl::PointCloud<DescriptorType>::Ptr Recognition::compute_descriptors(
     pcl::PointCloud<PointType>::Ptr &pointcloud_ptr,
     pcl::PointCloud<PointType>::Ptr &pointcloud_keypoints_ptr,
@@ -195,6 +212,7 @@ pcl::PointCloud<DescriptorType>::Ptr Recognition::compute_descriptors(
     return pointcloud_descriptors_ptr;
 }
 
+// Find correspondences
 pcl::CorrespondencesPtr Recognition::find_correspondences(
     pcl::PointCloud<DescriptorType>::Ptr &model_descriptors_ptr,
     pcl::PointCloud<DescriptorType>::Ptr &scene_descriptors_ptr
@@ -226,6 +244,7 @@ pcl::CorrespondencesPtr Recognition::find_correspondences(
     return correspondences_ptr;
 }
 
+// Compute Local reference frames for the points
 pcl::PointCloud<RFType>::Ptr Recognition::compute_reference_frames(
     pcl::PointCloud<PointType>::Ptr &pointcloud_ptr,
     pcl::PointCloud<PointType>::Ptr &pointcloud_keypoints_ptr,
@@ -246,6 +265,7 @@ pcl::PointCloud<RFType>::Ptr Recognition::compute_reference_frames(
     return pointcloud_rf;
 }
 
+// Hough clustering algorithm
 std::tuple<
     std::vector<Eigen::Matrix4f, Eigen::aligned_allocator<Eigen::Matrix4f>>,
     std::vector<pcl::Correspondences>
@@ -294,6 +314,7 @@ std::tuple<
     return {rototranslations, clustered_corrs};
 }
 
+// Geometric consistency clustering algorithm
 std::tuple<
     std::vector<Eigen::Matrix4f, Eigen::aligned_allocator<Eigen::Matrix4f>>,
     std::vector<pcl::Correspondences>
@@ -322,6 +343,7 @@ std::tuple<
     return {rototranslations, clustered_corrs};
 }
 
+// Print the details of the results obtained
 void Recognition::result_analysis(
     std::vector<Eigen::Matrix4f, Eigen::aligned_allocator<Eigen::Matrix4f>> rototranslations,
     std::vector<pcl::Correspondences> clustered_corrs
@@ -346,6 +368,7 @@ void Recognition::result_analysis(
     }
 }
 
+// Visualize the correspondences and keypoints
 void Recognition::visualization(
     pcl::PointCloud<PointType>::Ptr &model_ptr,
     pcl::PointCloud<PointType>::Ptr &model_keypoints_ptr,
@@ -405,6 +428,7 @@ void Recognition::visualization(
     }
 }
 
+// Returns the pointer to the pointcloud loaded from the pcd file
 pcl::PointCloud<PointType>::Ptr Recognition::load_from_pcd(std::string &filepath)
 {
     pcl::PointCloud<PointType>::Ptr pointcloud_ptr(new pcl::PointCloud<PointType>); 
@@ -416,6 +440,7 @@ pcl::PointCloud<PointType>::Ptr Recognition::load_from_pcd(std::string &filepath
     return pointcloud_ptr; 
 }
 
+// Save the given pointcloud to the specified filepath
 void Recognition::save_to_pcd(pcl::PointCloud<PointType>::Ptr &pointcloud_ptr, std::string &filepath)
 {
     if(pcl::io::savePCDFileASCII (filepath, *pointcloud_ptr)>=0)
@@ -428,6 +453,7 @@ void Recognition::save_to_pcd(pcl::PointCloud<PointType>::Ptr &pointcloud_ptr, s
     }
 }
 
+// Make the mean of the pointcloud zero
 pcl::PointCloud<PointType>::Ptr Recognition::center_pointcloud(pcl::PointCloud<PointType>::Ptr &pointcloud_ptr)
 {
     pcl::PointCloud<PointType>::Ptr transformed_cloud_ptr(new pcl::PointCloud<PointType>);
@@ -454,6 +480,7 @@ pcl::PointCloud<PointType>::Ptr Recognition::center_pointcloud(pcl::PointCloud<P
     return transformed_cloud_ptr;
 }
 
+// Loads the file from the input filepath, centers it, and then saves it in the output path
 void Recognition::center_n_save(
     std::string &input_filepath, std::string &output_filepath
 )

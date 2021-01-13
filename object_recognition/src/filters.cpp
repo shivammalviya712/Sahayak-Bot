@@ -8,6 +8,7 @@ Filters::Filters() {};
 
 Filters::~Filters() {};
 
+// Voxel filter: Downsamples the pointcloud
 pcl::PointCloud<PointType>::Ptr Filters::voxel_filter(
     pcl::PointCloud<PointType>::Ptr &pointcloud_ptr,
     std::vector<float> leaf_size
@@ -24,6 +25,7 @@ pcl::PointCloud<PointType>::Ptr Filters::voxel_filter(
     return filtered_cloud_ptr;
 }
 
+// Cropbox filter: Remove the points outside the specified range
 pcl::PointCloud<PointType>::Ptr Filters::cropbox_filter(
     pcl::PointCloud<PointType>::Ptr &pointcloud_ptr,
     Eigen::Vector4f min_range,
@@ -46,6 +48,7 @@ pcl::PointCloud<PointType>::Ptr Filters::cropbox_filter(
     return filtered_cloud_ptr;
 }
 
+// RANSAC filter: Separate the pointcloud in inliers and outliers, according to the specified model
 pcl::PointCloud<PointType>::Ptr Filters::ransac_filter(
     pcl::PointCloud<PointType>::Ptr &pointcloud_ptr,
     float threshold
@@ -74,6 +77,7 @@ pcl::PointCloud<PointType>::Ptr Filters::ransac_filter(
     return filtered_cloud_ptr;
 }
 
+// Remove the outlier points
 pcl::PointCloud<PointType>::Ptr Filters::statistical_outlier_filter(
     pcl::PointCloud<PointType>::Ptr &pointcloud_ptr
 )

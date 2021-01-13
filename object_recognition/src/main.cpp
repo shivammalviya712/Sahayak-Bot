@@ -11,9 +11,6 @@ int main(int argc, char **argv)
     ros::NodeHandle node_handle;
     ros::Rate loop_rate(1);
 
-    // Spin until arm is ready!
-
-
     Camera camera(node_handle);
 
     // Buffer so that we can receive callback messages

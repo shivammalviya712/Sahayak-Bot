@@ -6,7 +6,8 @@ Author: eYRC_SB_363
 #include <object_recognition/camera_settings.hpp>
 
 Camera::Camera(ros::NodeHandle node_handle)
-{
+{   
+    // Definition
     _node_handle = node_handle;
     _pc_topic = "camera2/depth/points2";
     _pcl_pc_ptr.reset(new pcl::PointCloud<PointType>());
@@ -17,28 +18,21 @@ Camera::Camera(ros::NodeHandle node_handle)
     _tfListenerPtr = new tf2_ros::TransformListener(_tfBuffer);
 }
 
+// Destructor
 Camera::~Camera() {}
 
+// Callback for pointcloud from camera
 void Camera::pc_callback(const sensor_msgs::PointCloud2ConstPtr &msg_ptr)
 {
+    // Updates _pcl_pc_ptr
     pcl::PCLPointCloud2 pcl_pc2;
     pcl_conversions::toPCL(*msg_ptr, pcl_pc2);
     pcl::fromPCLPointCloud2(pcl_pc2, *_pcl_pc_ptr);
 }
 
+// Pass pointcloud through various filters
 void Camera::preprocess()
 {
-    // Save
-    // save_pc(_pcl_pc_ptr, "raw");
-    
-    // Voxel Filter
-    // _pcl_pc_ptr = _filters.voxel_filter(
-    //     _pcl_pc_ptr,
-    //     CameraSettings::Filters::VoxelFilter::leaf_size
-    // );
-    // Save
-    // save_pc(_pcl_pc_ptr, "after_voxel");
-
     // Cropbox Filter
     _pcl_pc_ptr = _filters.cropbox_filter(
         _pcl_pc_ptr,
@@ -70,6 +64,7 @@ void Camera::preprocess()
 
 }
 
+// Prints the details about the pointcloud
 void Camera::analysis()
 {    
     std::cout << "Analysis of Pointcloud\n  "
@@ -78,15 +73,11 @@ void Camera::analysis()
         << std::endl;
 }
 
+// Save the given pointcloud with the specified name
 void Camera::save_pc(pcl::PointCloud<PointType>::Ptr &pointcloud_ptr, std::string filename)
 {
     filename = filename + ".pcd";
-    if(
-        pcl::io::savePCDFileASCII (
-            "/home/raj/catkin_ws/src/SBRepo/object_recognition/point_cloud/" + filename,
-            *_pcl_pc_ptr
-        )>=0
-    )
+    if(pcl::io::savePCDFileASCII(_pointcloud_dir+filename, *_pcl_pc_ptr)>=0)
     {
         std::cout << "Saved " << filename << "\n" << std::endl;
     }
@@ -97,6 +88,7 @@ void Camera::save_pc(pcl::PointCloud<PointType>::Ptr &pointcloud_ptr, std::strin
     
 }
 
+// Save the given pointcloud with the specified name
 void Camera::save_pc(std::vector<pcl::PointCloud<PointType>::Ptr> &ptrs_cluster, std::string filename)
 {
     pcl::PointCloud<PointType>::Ptr cloud_cluster_ptr;
@@ -104,12 +96,7 @@ void Camera::save_pc(std::vector<pcl::PointCloud<PointType>::Ptr> &ptrs_cluster,
     {
         cloud_cluster_ptr = ptrs_cluster[j];
         std::string clustername = filename + std::to_string(j) + ".pcd";
-        if(
-            pcl::io::savePCDFileASCII (
-                "/home/raj/catkin_ws/src/SBRepo/object_recognition/point_cloud/" + clustername,
-                *cloud_cluster_ptr
-            )>=0
-        )
+        if(pcl::io::savePCDFileASCII(_pointcloud_dir+clustername, *cloud_cluster_ptr)>=0)
         {
             std::cout << "Saved " << clustername << std::endl;
         }
@@ -121,7 +108,8 @@ void Camera::save_pc(std::vector<pcl::PointCloud<PointType>::Ptr> &ptrs_cluster,
     std::cout << "" << std::endl;
 }
 
-void Camera::detect() 
+// Detect the objects and publish their pose
+void Camera::detect()
 {
     bool debug = true;
     std::string target_frame = "base_link";
@@ -150,7 +138,7 @@ void Camera::detect()
 
         // This is very inefficient!!!
         // https://stackoverflow.com/questions/35669182/this-predefined-function-slowing-down-my-programs-performance
-        pcl::getMinMax3D (object_cloud, min_point, max_point);
+        pcl::getMinMax3D(object_cloud, min_point, max_point);
         centroid.x = (min_point.x+max_point.x)/2.0f;
         centroid.y = (min_point.y+max_point.y)/2.0f;
         centroid.z = (min_point.z+max_point.z)/2.0f;
@@ -219,5 +207,4 @@ void Camera::detect()
     //     char c;
     //     cout << "Enter any character to continue: ";
     //     cin >> c;
-    // }
 }
