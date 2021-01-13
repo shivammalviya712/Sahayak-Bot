@@ -13,9 +13,9 @@ class PoseSettings:
     self.coke = Config()
     self.battery = Config()
     self.glue = Config()
-    self.set_coke_config(centroids['coke_can'])
-    self.set_battery_config(centroids['battery'])
-    self.set_battery_config(centroids['glue_box'])
+    self.set_coke_config(centroids['Coke Can'])
+    self.set_battery_config(centroids['Battery'])
+    self.set_battery_config(centroids['Glue Box'])
     
   def set_coke_config(self, centroid):
     ''''''
@@ -28,10 +28,10 @@ class PoseSettings:
     self.coke.pick_pose.orientation.w = 0.0034
     # self.coke.pick_pose.position.x = 0.540000  # centroid_x
     # self.coke.pick_pose.position.y = -0.240000  # centroid_y
-    self.coke.pick_pose.position.x = centroid.x  # centroid_x
-    self.coke.pick_pose.position.y = centroid.y  # centroid_y
+    self.coke.pick_pose.position.x = centroid.position.x  # centroid_x
+    self.coke.pick_pose.position.y = centroid.position.y  # centroid_y
     # centroid_z=0.609995;half ht.=0.07;ascend 0.18 for pickup
-    self.coke.pick_pose.position.z = (centroid.z + 0.07) + 0.18
+    self.coke.pick_pose.position.z = (centroid.position.z + 0.07) + 0.18
 
     self.coke.place_pose.position.x = 0.0350783554977
     self.coke.place_pose.position.y = -0.684259610707
@@ -56,10 +56,10 @@ class PoseSettings:
     self.battery.pick_pose.orientation.w = 0.0034
     # self.battery.pick_pose.position.x = 0.540000  # centroid_x
     # self.battery.pick_pose.position.y = -0.240000  # centroid_y
-    self.battery.pick_pose.position.x = centroid.x  # centroid_x
-    self.battery.pick_pose.position.y = centroid.y  # centroid_y
+    self.battery.pick_pose.position.x = centroid.position.x  # centroid_x
+    self.battery.pick_pose.position.y = centroid.position.y  # centroid_y
     # centroid_z=0.609995;half ht.=0.07;ascend 0.18 for pickup
-    self.battery.pick_pose.position.z = (centroid.z + 0.07) + 0.18
+    self.battery.pick_pose.position.z = (centroid.position.z + 0.07) + 0.18
 
     self.battery.place_pose.position.x = 0.0350783554977
     self.battery.place_pose.position.y = -0.684259610707
@@ -82,10 +82,10 @@ class PoseSettings:
     self.glue.pick_pose.orientation.w = 0.0034
     # self.glue.pick_pose.position.x = 0.540000  # centroid_x
     # self.glue.pick_pose.position.y = -0.240000  # centroid_y
-    self.glue.pick_pose.position.x = centroid.x  # centroid_x
-    self.glue.pick_pose.position.y = centroid.y  # centroid_y
+    self.glue.pick_pose.position.x = centroid.position.x  # centroid_x
+    self.glue.pick_pose.position.y = centroid.position.y  # centroid_y
     # centroid_z=0.609995;half ht.=0.07;ascend 0.18 for pickup
-    self.glue.pick_pose.position.z = (centroid.z + 0.07) + 0.18
+    self.glue.pick_pose.position.z = (centroid.position.z + 0.07) + 0.18
 
     self.glue.place_pose.position.x = 0.0350783554977
     self.glue.place_pose.position.y = -0.684259610707
@@ -108,10 +108,10 @@ class PoseSettings:
     self.biscuits.pick_pose.orientation.w = 0.0034
     # self.biscuits.pick_pose.position.x = 0.540000  # centroid_x
     # self.biscuits.pick_pose.position.y = -0.240000  # centroid_y
-    self.biscuits.pick_pose.position.x = centroid.x  # centroid_x
-    self.biscuits.pick_pose.position.y = centroid.y  # centroid_y
+    self.biscuits.pick_pose.position.x = centroid.position.x  # centroid_x
+    self.biscuits.pick_pose.position.y = centroid.position.y  # centroid_y
     # centroid_z=0.609995;half ht.=0.07;ascend 0.18 for pickup
-    self.biscuits.pick_pose.position.z = (centroid.z + 0.07) + 0.18
+    self.biscuits.pick_pose.position.z = (centroid.position.z + 0.07) + 0.18
 
     self.biscuits.place_pose.position.x = 0.0350783554977
     self.biscuits.place_pose.position.y = -0.684259610707

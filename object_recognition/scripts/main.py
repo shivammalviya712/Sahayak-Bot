@@ -8,7 +8,7 @@ object_centroids = {}
 
 
 def detection_info_callback(data):
-  object_centroids[data.name] = data.pose
+  object_centroids[data.name] = data.pose.pose
 
 
 def main():
