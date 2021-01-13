@@ -29,7 +29,7 @@ void Camera::pc_callback(const sensor_msgs::PointCloud2ConstPtr &msg_ptr)
 void Camera::preprocess()
 {
     // Save
-    save_pc(_pcl_pc_ptr, "raw");
+    // save_pc(_pcl_pc_ptr, "raw");
     
     // Voxel Filter
     // _pcl_pc_ptr = _filters.voxel_filter(
@@ -48,25 +48,25 @@ void Camera::preprocess()
         CameraSettings::Filters::CropboxFilter::rotation
     );
     // Save
-    save_pc(_pcl_pc_ptr, "after_cropbox");
+    // save_pc(_pcl_pc_ptr, "after_cropbox");
 
     // Ransac filter
     _pcl_pc_ptr = _filters.ransac_filter(
         _pcl_pc_ptr,
         CameraSettings::Filters::RansacFilter::threshold
     );
-    // Save
-    save_pc(_pcl_pc_ptr, "after_ransac");
-
-    // // Clustering
-    // _ptrs_cluster = _filters.cluster_filter(
-    //     _pcl_pc_ptr,
-    //     CameraSettings::Filters::ClusterFilter::tolerance,
-    //     CameraSettings::Filters::ClusterFilter::min_cluster_size,
-    //     CameraSettings::Filters::ClusterFilter::max_cluster_size
-    // );
     // // Save
-    // save_pc(_ptrs_cluster, "after_cluster");
+    // save_pc(_pcl_pc_ptr, "after_ransac");
+
+    // Clustering
+    _ptrs_cluster = _filters.cluster_filter(
+        _pcl_pc_ptr,
+        CameraSettings::Filters::ClusterFilter::tolerance,
+        CameraSettings::Filters::ClusterFilter::min_cluster_size,
+        CameraSettings::Filters::ClusterFilter::max_cluster_size
+    );
+    // // Save
+    save_pc(_ptrs_cluster, "after_cluster");
 
 }
 
@@ -83,7 +83,7 @@ void Camera::save_pc(pcl::PointCloud<PointType>::Ptr &pointcloud_ptr, std::strin
     filename = filename + ".pcd";
     if(
         pcl::io::savePCDFileASCII (
-            "/home/raj/catkin_ws/src/SBRepo/object_recognition/point_cloud/" + filename,
+            "/home/shivam/Projects/eYRC/catkin_ws/src/object_recognition/point_cloud/" + filename,
             *_pcl_pc_ptr
         )>=0
     )
@@ -106,7 +106,7 @@ void Camera::save_pc(std::vector<pcl::PointCloud<PointType>::Ptr> &ptrs_cluster,
         std::string clustername = filename + std::to_string(j) + ".pcd";
         if(
             pcl::io::savePCDFileASCII (
-                "/home/raj/catkin_ws/src/SBRepo/object_recognition/point_cloud/" + clustername,
+                "/home/shivam/Projects/eYRC/catkin_ws/src/object_recognition/point_cloud/" + clustername,
                 *cloud_cluster_ptr
             )>=0
         )
@@ -125,75 +125,79 @@ void Camera::detect()
 {
     bool debug = true;
 
-    std::vector<std::vector<float>> centroids;
-    centroids = recognizer.recognize_objects(_pcl_pc_ptr);
-    std::string target_frame = "base_link";
-    std::string source_frame = "camera_depth_frame2";
-    geometry_msgs::TransformStamped transformStamped = _tfBuffer.lookupTransform(
-        target_frame, 
-        source_frame,
-        ros::Time(0)
-    );
-    geometry_msgs::PoseStamped object_pose_stamped;
-    object_pose_stamped.pose.orientation.x = 0;
-    object_pose_stamped.pose.orientation.y = 0;
-    object_pose_stamped.pose.orientation.z = 0;
-    object_pose_stamped.pose.orientation.w = 1;
-    object_recognition::ObjectPose object_pose;
+    std::vector<pcl::PointCloud<pcl::PointXYZRGB>> ptrs_object_cluster;
+    recognizer.recognize_objects(_ptrs_cluster);
+    
+    
+    // std::vector<std::vector<float>> centroids;
+    // centroids = recognizer.recognize_objects(_ptrs_cluster);
+    // std::string target_frame = "base_link";
+    // std::string source_frame = "camera_depth_frame2";
+    // geometry_msgs::TransformStamped transformStamped = _tfBuffer.lookupTransform(
+    //     target_frame, 
+    //     source_frame,
+    //     ros::Time(0)
+    // );
+    // geometry_msgs::PoseStamped object_pose_stamped;
+    // object_pose_stamped.pose.orientation.x = 0;
+    // object_pose_stamped.pose.orientation.y = 0;
+    // object_pose_stamped.pose.orientation.z = 0;
+    // object_pose_stamped.pose.orientation.w = 1;
+    // object_recognition::ObjectPose object_pose;
 
-    // Transform such that the pose is w.r.to the base link
-    // Reference: https://piazza.com/class/kftilbrk6dm7ea?cid=1120
-    object_pose_stamped.pose.position.x = centroids[0][0];
-    object_pose_stamped.pose.position.y = centroids[0][1];
-    object_pose_stamped.pose.position.z = centroids[0][2];
-    tf2::doTransform(
-        object_pose_stamped, 
-        object_pose_stamped, 
-        transformStamped
-    );
-    object_pose.name = "Coke can";
-    object_pose.pose = object_pose_stamped;
-    _centroid_pub_rviz.publish(object_pose.pose);
-    _centroid_pub.publish(object_pose);
-    if(debug){
-        char c;
-        cout << "Enter any character to continue: ";
-        cin >> c;
-    }
+    // // Transform such that the pose is w.r.to the base link
+    // // Reference: https://piazza.com/class/kftilbrk6dm7ea?cid=1120
+    // object_pose_stamped.pose.position.x = centroids[0][0];
+    // object_pose_stamped.pose.position.y = centroids[0][1];
+    // object_pose_stamped.pose.position.z = centroids[0][2];
+    // tf2::doTransform(
+    //     object_pose_stamped, 
+    //     object_pose_stamped, 
+    //     transformStamped
+    // );
+    // object_pose.name = "Coke can";
+    // object_pose.pose = object_pose_stamped;
+    // _centroid_pub_rviz.publish(object_pose.pose);
+    // _centroid_pub.publish(object_pose);
+    // if(debug){
+    //     char c;
+    //     cout << "Enter any character to continue: ";
+    //     cin >> c;
+    // }
 
-    object_pose_stamped.pose.position.x = centroids[1][0];
-    object_pose_stamped.pose.position.y = centroids[1][1];
-    object_pose_stamped.pose.position.z = centroids[1][2];
-    tf2::doTransform(
-        object_pose_stamped, 
-        object_pose_stamped, 
-        transformStamped
-    );
-    object_pose.name = "Battery";
-    object_pose.pose = object_pose_stamped;
-    _centroid_pub_rviz.publish(object_pose.pose);
-    _centroid_pub.publish(object_pose);
-    if(debug){
-        char c;
-        cout << "Enter any character to continue: ";
-        cin >> c;
-    }
+    // object_pose_stamped.pose.position.x = centroids[1][0];
+    // object_pose_stamped.pose.position.y = centroids[1][1];
+    // object_pose_stamped.pose.position.z = centroids[1][2];
+    // tf2::doTransform(
+    //     object_pose_stamped, 
+    //     object_pose_stamped, 
+    //     transformStamped
+    // );
+    // object_pose.name = "Battery";
+    // object_pose.pose = object_pose_stamped;
+    // _centroid_pub_rviz.publish(object_pose.pose);
+    // _centroid_pub.publish(object_pose);
+    // if(debug){
+    //     char c;
+    //     cout << "Enter any character to continue: ";
+    //     cin >> c;
+    // }
 
-    object_pose_stamped.pose.position.x = centroids[2][0];
-    object_pose_stamped.pose.position.y = centroids[2][1];
-    object_pose_stamped.pose.position.z = centroids[2][2];
-    tf2::doTransform(
-        object_pose_stamped, 
-        object_pose_stamped, 
-        transformStamped
-    );
-    object_pose.name = "Glue";
-    object_pose.pose = object_pose_stamped;
-    _centroid_pub_rviz.publish(object_pose.pose);
-    _centroid_pub.publish(object_pose);
-    if(debug){
-        char c;
-        cout << "Enter any character to continue: ";
-        cin >> c;
-    }
+    // object_pose_stamped.pose.position.x = centroids[2][0];
+    // object_pose_stamped.pose.position.y = centroids[2][1];
+    // object_pose_stamped.pose.position.z = centroids[2][2];
+    // tf2::doTransform(
+    //     object_pose_stamped, 
+    //     object_pose_stamped, 
+    //     transformStamped
+    // );
+    // object_pose.name = "Glue";
+    // object_pose.pose = object_pose_stamped;
+    // _centroid_pub_rviz.publish(object_pose.pose);
+    // _centroid_pub.publish(object_pose);
+    // if(debug){
+    //     char c;
+    //     cout << "Enter any character to continue: ";
+    //     cin >> c;
+    // }
 }

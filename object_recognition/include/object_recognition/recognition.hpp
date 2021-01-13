@@ -45,22 +45,20 @@ private:
     float _descr_rad = 0.02f;
     float _cg_size = 0.01f;
     float _cg_thresh = 5.0f;
-    std::string _can_filepath;
-    std::string _battery_filepath;
-    std::string _glue_filepath;
-    pcl::PointCloud<PointType>::Ptr _scene_ptr;
-    pcl::PointCloud<PointType>::Ptr _scene_keypoints_ptr;
-    pcl::PointCloud<NormalType>::Ptr _scene_normals_ptr;
-    pcl::PointCloud<DescriptorType>::Ptr _scene_descriptors_ptr;
+    std::vector<std::string> _files;
 
     // Methods
 public:
     Recognition();
     ~Recognition();
-    std::vector<std::vector<float>> recognize_objects(pcl::PointCloud<PointType>::Ptr &scene_ptr);
+    std::vector<pcl::PointCloud<PointType>::Ptr> recognize_objects(std::vector<pcl::PointCloud<PointType>::Ptr> &ptrs_clusters);
     // TODO: There might be better method to return this with pointer
-    std::vector<float>  get_pc_centroid(
-        pcl::PointCloud<PointType>::Ptr &model_ptr
+    int get_correspondence_size(
+        pcl::PointCloud<PointType>::Ptr &model_ptr,
+        pcl::PointCloud<PointType>::Ptr &cluster_ptr,
+        pcl::PointCloud<PointType>::Ptr &cluster_keypoints_ptr,
+        pcl::PointCloud<NormalType>::Ptr &cluster_normals_ptr,
+        pcl::PointCloud<DescriptorType>::Ptr &cluster_descriptors_ptr
     );
     pcl::PointCloud<NormalType>::Ptr compute_normals(
         pcl::PointCloud<PointType>::Ptr &pointcloud_ptr,
@@ -77,8 +75,8 @@ public:
         float radius_search
     );
     pcl::CorrespondencesPtr find_correspondences(
-        pcl::PointCloud<DescriptorType>::Ptr &model_descriptors,
-        pcl::PointCloud<DescriptorType>::Ptr &scene_descriptors
+        pcl::PointCloud<DescriptorType>::Ptr &model_descriptors_ptr,
+        pcl::PointCloud<DescriptorType>::Ptr &scene_descriptors_ptr
     );
     pcl::PointCloud<RFType>::Ptr compute_reference_frames(
         pcl::PointCloud<PointType>::Ptr &pointcloud_ptr,
