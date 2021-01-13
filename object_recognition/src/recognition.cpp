@@ -6,9 +6,9 @@ Author: eYRC_SB_363
 
 Recognition::Recognition()
 {
-    _files.push_back("/home/shivam/Projects/eYRC/catkin_ws/src/object_recognition/point_cloud/can1.pcd");
-    _files.push_back("/home/shivam/Projects/eYRC/catkin_ws/src/object_recognition/point_cloud/battery1.pcd");
-    _files.push_back("/home/shivam/Projects/eYRC/catkin_ws/src/object_recognition/point_cloud/glue1.pcd");
+    _files.push_back("/home/raj/catkin_ws/src/SBRepo/object_recognition/point_cloud/can1.pcd");
+    _files.push_back("/home/raj/catkin_ws/src/SBRepo/object_recognition/point_cloud/battery1.pcd");
+    _files.push_back("/home/raj/catkin_ws/src/SBRepo/object_recognition/point_cloud/glue1.pcd");
 }
 
 Recognition::~Recognition() {}

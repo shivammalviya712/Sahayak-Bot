@@ -4,7 +4,7 @@ Author: eYRC_SB_363
 '''
 from geometry_msgs.msg import Pose
 
-class Config():
+class Config:
   """"""
 
   def __init__(self):
