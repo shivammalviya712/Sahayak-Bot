@@ -111,7 +111,7 @@ void Camera::save_pc(std::vector<pcl::PointCloud<PointType>::Ptr> &ptrs_cluster,
 // Detect the objects and publish their pose
 void Camera::detect()
 {
-    bool debug = true;
+    bool debug = false;
     std::string target_frame = "base_link";
     std::string source_frame = "camera_depth_frame2";
     geometry_msgs::TransformStamped transformStamped = _tfBuffer.lookupTransform(
