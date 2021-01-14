@@ -25,6 +25,8 @@ int main(int argc, char **argv)
     camera.preprocess();
     camera.detect();
 
+    ros::shutdown();
+
     return 0;
 }
 
