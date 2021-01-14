@@ -123,7 +123,7 @@ void Camera::detect()
     std::vector<pcl::PointCloud<pcl::PointXYZRGB>::Ptr> ptrs_object_cluster;
     ptrs_object_cluster = recognizer.recognize_objects(_ptrs_cluster);
     PointType min_point, max_point, centroid;
-    std::vector<std::string> object_names{"Coke Can", "Battery", "Glue Box"};
+    std::vector<std::string> object_names{"Coke Can", "Battery", "Glue"};
 
     geometry_msgs::PoseStamped object_pose_stamped;
     object_pose_stamped.pose.orientation.x = 0;
