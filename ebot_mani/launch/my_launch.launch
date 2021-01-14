@@ -59,7 +59,8 @@ args="spawn joint_state_controller" respawn="false" output="screen"/>
 
 
 <!-- Node to controller manipulator -->
-<!-- <node name="sara" pkg="ebot_mani" type="explore_pointcloud2.py" output="screen"/> -->
+<node name="sara" pkg="object_recognition" type="main.py" output="screen"/>
+<node name="detector" pkg="object_recognition" type="object_recognition_main_node" output="screen"/>
 
 
 </launch>

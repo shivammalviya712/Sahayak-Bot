@@ -154,8 +154,8 @@ class Filters(object):
         tree = point_cloud_xyz.make_kdtree()
         ec = point_cloud_xyz.make_EuclideanClusterExtraction()
         ec.set_ClusterTolerance(0.02)
-        ec.set_MinClusterSize(min_cluster_size)
-        ec.set_MaxClusterSize(max_cluster_size)
+        ec.set_MinClusterSize(100)
+        ec.set_MaxClusterSize(25000)
         ec.set_SearchMethod(tree)
         cluster_indices = ec.Extract()
         clusters = []
