@@ -21,7 +21,9 @@ def main():
     rospy.init_node(node_name, anonymous=True)
     detect_pub = rospy.Publisher('detect', Bool, queue_size=10)
     sara = Manipulator()
-
+    # print("\n\n\n")
+    # print(sara.scene.get_known_object_names())
+    # print("\n\n\n")    
     capture_pose = [0.12965710797413593, -0.2558361846975669, -
                     0.4842167126928663, -1.525936090630152, 5.7309490891563115, 1.807201005762695]
     sara.set_joint_angles(capture_pose)
@@ -36,8 +38,16 @@ def main():
 
     print(object_centroids)
     add_objects(sara.scene)
-
     settings = PoseSettings(object_centroids)
+
+    # print("\n\n\n")
+    # print(sara.scene.get_known_object_names())
+    # print("\n\n\n") 
+
+    sara.pick(settings.coke)
+    rospy.sleep(1.0)
+    sara.place(settings.coke)
+    rospy.sleep(1.0)
 
 
 def add_objects(scene):
@@ -47,33 +57,33 @@ def add_objects(scene):
     pose = PoseStamped()
 
     pose.pose = object_centroids["Coke Can"].pose
-    pose.pose.position.z = 0.80
+    pose.pose.position.z = 0.279
     pose.pose.orientation.w = 0
-    pose.header.frame_id = "ebot_base"
+    pose.header.frame_id = "base_link"
     scene.add_box(
-        name="Coke can",
+        name="Coke Can",
         pose=pose,
-        size=(0.06, 0.06, 0.12)
+        size=(0.01, 0.01, 0.05)
     )
 
     pose.pose = object_centroids["Battery"].pose
-    pose.pose.position.z = 0.79
+    pose.pose.position.z = 0.269
     pose.pose.orientation.w = 0
-    pose.header.frame_id = "ebot_base"
+    pose.header.frame_id = "base_link"
     scene.add_box(
         name="Battery",
         pose=pose,
-        size=(0.06, 0.06, 0.1)
+        size=(0.01, 0.01, 0.05)
     )
 
     pose.pose = object_centroids["Glue"].pose
-    pose.pose.position.z = 0.80
+    pose.pose.position.z = 0.279
     pose.pose.orientation.w = 0
-    pose.header.frame_id = "ebot_base"
+    pose.header.frame_id = "base_link"
     scene.add_box(
         name="Glue",
         pose=pose,
-        size=(0.06, 0.02, 0.12)
+        size=(0.01, 0.01, 0.05)
     )
 
 

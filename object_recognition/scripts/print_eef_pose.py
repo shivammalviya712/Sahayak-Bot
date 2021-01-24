@@ -40,6 +40,7 @@ class Ur5Moveit:
         rospy.loginfo('\033[94m' + " >>> Ur5Moveit init done." + '\033[0m')
 
     def print_pose_ee(self):
+        print(self._robot.get_planning_frame())
         pose_values = self._group.get_current_pose().pose
         rospy.loginfo(pose_values)
         

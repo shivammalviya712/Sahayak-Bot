@@ -32,6 +32,18 @@ class Manipulator:
         )
 
 
+    def go_to(self, target_pose):
+        """"""
+        self.arm_group.set_pose_target(target_pose)
+        flag_plan = self.arm_group.go(wait=True)
+        self.arm_group.stop()
+
+        if (flag_plan == True):
+            rospy.loginfo('Target pose reached!!')
+
+        return flag_plan
+
+
     def set_joint_angles(self, arg_list_joint_angles):
         """"""
         list_joint_values = self.arm_group.get_current_joint_values()
@@ -58,6 +70,7 @@ class Manipulator:
                 '\033[94m' + ">>> set_joint_angles() Failed." + '\033[0m')
 
         return flag_plan
+
 
     def openGripper(self, posture):
         """
@@ -109,17 +122,17 @@ class Manipulator:
         place_location = PlaceLocation()
 
         # The position of the end-effector for the place relative to a reference frame
-        place_location.place_pose.header.frame_id = "world"
+        place_location.place_pose.header.frame_id = "ebot_base"
         place_location.place_pose.pose = object_config.place_pose
 
         # The approach motion
-        place_location.pre_place_approach.direction.header.frame_id = "world"
+        place_location.pre_place_approach.direction.header.frame_id = "ebot_base"
         place_location.pre_place_approach.direction.vector.z = -1.0
         place_location.pre_place_approach.min_distance = 0.1
         place_location.pre_place_approach.desired_distance = 0.115
 
         # The retreat motion
-        place_location.post_place_retreat.direction.header.frame_id = "world"
+        place_location.post_place_retreat.direction.header.frame_id = "ebot_base"
         place_location.post_place_retreat.direction.vector.z = 1.0
         place_location.post_place_retreat.min_distance = 0.1
         place_location.post_place_retreat.desired_distance = 0.115
@@ -134,6 +147,7 @@ class Manipulator:
 
         # Call place to place the object using the place locations given
         self.arm_group.place(object_config.object_id, place_location)
+
 
     def pick(self, object_config):
         """
@@ -150,26 +164,26 @@ class Manipulator:
         # This is the pose of the "parent_link" of the
         # end-effector, not actually the pose of any
         # link *in* the end-effector.
-        grasp.grasp_pose.header.frame_id = "world"
+        grasp.grasp_pose.header.frame_id = "ebot_base"
         grasp.grasp_pose.pose = object_config.pick_pose
 
         # The approach direction to take before picking an object.
-        grasp.pre_grasp_approach.direction.header.frame_id = "world"
+        grasp.pre_grasp_approach.direction.header.frame_id = "ebot_base"
         grasp.pre_grasp_approach.direction.vector.z = -1.0
         # The min distance that must be considered feasible before the
         # grasp is even attempted
-        grasp.pre_grasp_approach.min_distance = 0.095
+        grasp.pre_grasp_approach.min_distance = 0.2
         # The desired translation distance
-        grasp.pre_grasp_approach.desired_distance = 0.115
+        grasp.pre_grasp_approach.desired_distance = 0.215
 
         # The retreat direction to take after a grasp has been completed (object is attached)
-        grasp.post_grasp_retreat.direction.header.frame_id = "world"
+        grasp.post_grasp_retreat.direction.header.frame_id = "ebot_base"
         grasp.post_grasp_retreat.direction.vector.z = 1.0
         # The min distance that must be considered feasible before the
         # grasp is even attempted
-        grasp.post_grasp_retreat.min_distance = 0.1
+        grasp.post_grasp_retreat.min_distance = 0.2
         # The desired translation distance
-        grasp.post_grasp_retreat.desired_distance = 0.25
+        grasp.post_grasp_retreat.desired_distance = 0.215
 
         # The internal posture of the hand for the pre-grasp
         # only positions are used
@@ -182,7 +196,7 @@ class Manipulator:
         # For pick/place operations, the name of the support surface is used
         # to specify the fact that attached objects are allowed to touch the
         # support surface.
-        self.arm_group.set_support_surface_name('short_table.dae')
+        self.arm_group.set_support_surface_name('office.dae_0')
 
         # Finally the most awaited moment, now pick it
         self.arm_group.pick(object_config.object_id, grasp)
